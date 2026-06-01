@@ -543,6 +543,18 @@
       gap: 8px;
       margin-top: 10px;
     }
+    .request-box {
+      width: 100%;
+      min-height: 168px;
+      border: 1px solid #bdd0c8;
+      border-radius: 8px;
+      padding: 10px;
+      font: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      color: var(--ink);
+      background: #fff;
+    }
     .countdown-item, .split-item, .fit-item {
       border: 1px solid #d8e4df;
       border-radius: 8px;
@@ -774,6 +786,28 @@
               <button type="button" onclick="resetSplitMembers()">重置成员</button>
             </div>
             <div class="split-list" id="splitResult"></div>
+          </article>
+        </div>
+
+        <div class="tool-grid" style="margin-top:16px;">
+          <article class="tool-card">
+            <h3>修改清单生成器</h3>
+            <div class="calculator">
+              <label class="field">想改成几人<input id="requestPeopleInput" type="number" min="1" placeholder="例如 4"></label>
+              <label class="field">想改出发日期<input id="requestDateInput" type="date"></label>
+              <label class="field">新增景点<input id="requestAddSpotInput" placeholder="例如 哲蚌寺、小昭寺"></label>
+              <label class="field">取消/降级<input id="requestRemoveInput" placeholder="例如 取消纳木错"></label>
+            </div>
+            <label class="field" style="margin-top:10px;">补充说明<textarea id="requestNoteInput" class="request-box" placeholder="例如：布宫约到了 7/5；酒店想换到八廓街附近；预算尽量控制在人均 6000 内。"></textarea></label>
+            <div class="toolbar">
+              <button type="button" onclick="generateChangeRequest()">生成修改说明</button>
+              <button type="button" onclick="copyChangeRequest()">复制给 Codex</button>
+            </div>
+          </article>
+          <article class="tool-card">
+            <h3>可复制内容</h3>
+            <textarea id="changeRequestOutput" class="request-box" readonly></textarea>
+            <p class="source-note" id="copyStatus">生成后复制这段内容发给我，我就能按清单更新公开网页。</p>
           </article>
         </div>
       </section>
@@ -1575,6 +1609,51 @@
       });
       syncPoiVisibility();
       map.fitBounds(L.latLngBounds(Object.values(pois)), { padding: [70, 70] });
+    }
+
+    function generateChangeRequest() {
+      const currentDeparture = document.getElementById("departureInput").value || readDepartureDate();
+      const requestedDate = document.getElementById("requestDateInput").value.trim();
+      const requestedPeople = document.getElementById("requestPeopleInput").value.trim();
+      const addSpot = document.getElementById("requestAddSpotInput").value.trim();
+      const removeItem = document.getElementById("requestRemoveInput").value.trim();
+      const note = document.getElementById("requestNoteInput").value.trim();
+      const visiblePois = selectedPoiNames();
+      const lines = [
+        "请帮我更新福州到拉萨旅游网页，并重新部署到 GitHub Pages。",
+        "",
+        `当前网页出发日期：${currentDeparture}`,
+        `当前预算估算：${money.format(Math.round(currentBudgetTotal))} 元`,
+        `当前分摊成员：${splitMembers.map(member => member.name).join("、") || "未设置"}`,
+        `当前地图显示景点：${visiblePois.join("、") || "未选择"}`,
+        "",
+        "我想修改："
+      ];
+      if (requestedDate) lines.push(`- 出发日期改为：${requestedDate}`);
+      if (requestedPeople) lines.push(`- 人数/分摊成员改为：${requestedPeople} 人`);
+      if (addSpot) lines.push(`- 新增景点/路线考虑：${addSpot}`);
+      if (removeItem) lines.push(`- 取消或降级：${removeItem}`);
+      if (note) lines.push(`- 补充说明：${note}`);
+      if (!requestedDate && !requestedPeople && !addSpot && !removeItem && !note) {
+        lines.push("- 我还没填写具体修改，请根据当前网页状态先给我建议。");
+      }
+      lines.push("");
+      lines.push("要求：保留现有互动功能、真实导航折线、天气、预算分摊和景点勾选。");
+      document.getElementById("changeRequestOutput").value = lines.join("\n");
+      document.getElementById("copyStatus").textContent = "修改说明已生成，可以复制发给 Codex。";
+    }
+
+    async function copyChangeRequest() {
+      const output = document.getElementById("changeRequestOutput");
+      if (!output.value.trim()) generateChangeRequest();
+      output.focus();
+      output.select();
+      try {
+        await navigator.clipboard.writeText(output.value);
+        document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+      } catch (error) {
+        document.getElementById("copyStatus").textContent = "浏览器未允许自动复制，文本已选中，可以手动 Ctrl+C。";
+      }
     }
 
     function setRouteVisible(routeId, visible) {
