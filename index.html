@@ -186,6 +186,12 @@
       font-size: 12px;
       line-height: 1.5;
     }
+    .filter-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin: 10px 0 14px;
+    }
     button, .btn {
       border: 1px solid #aac8bd;
       background: #fff;
@@ -462,6 +468,52 @@
       font-weight: 400;
       margin-top: 4px;
     }
+    .countdown-list, .split-list, .fit-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .countdown-item, .split-item, .fit-item {
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+    }
+    .countdown-item strong, .split-item strong {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #24313f;
+      line-height: 1.4;
+    }
+    .countdown-item span, .split-item span, .fit-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+    .fit-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .fit-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f2f7f5;
+      border: 1px solid #d8e4df;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .fit-tag.good { background: #e7f8ef; color: #166534; border-color: #b9e7cb; }
+    .fit-tag.warn { background: #fff7e8; color: #92400e; border-color: #f1c36d; }
+    .fit-tag.risk { background: #feecec; color: #991b1b; border-color: #f5b5b5; }
     .source-note {
       color: var(--muted);
       font-size: 12px;
@@ -593,6 +645,25 @@
             <div class="budget-total" id="budgetResult"></div>
           </article>
         </div>
+
+        <div class="tool-grid" style="margin-top:16px;">
+          <article class="tool-card">
+            <h3>预约倒计时</h3>
+            <p>按今天日期自动计算下一步要做什么，过期项目会提示尽快补办。</p>
+            <div class="countdown-list" id="countdownList"></div>
+          </article>
+
+          <article class="tool-card">
+            <h3>三人预算分摊</h3>
+            <div class="calculator">
+              <label class="field">甲已垫付<input id="payerAInput" type="number" min="0" value="0"></label>
+              <label class="field">乙已垫付<input id="payerBInput" type="number" min="0" value="0"></label>
+              <label class="field">丙已垫付<input id="payerCInput" type="number" min="0" value="0"></label>
+              <label class="field">共同人数<input id="splitPeopleInput" type="number" min="1" value="3"></label>
+            </div>
+            <div class="split-list" id="splitResult"></div>
+          </article>
+        </div>
       </section>
 
       <section id="map-section">
@@ -605,6 +676,8 @@
               <button onclick="fitCity()">只看市内</button>
               <button onclick="fitRemote()">只看远郊</button>
             </div>
+            <h3>按天筛选</h3>
+            <div class="filter-group" id="routeFilters"></div>
             <h3>市内小交通</h3>
             <div id="cityRoutes"></div>
             <h3>远郊一日游</h3>
@@ -718,24 +791,24 @@
       "纳木错方向": [30.786294, 91.111199]
     };
     const routes = [
-      { id: "R1", type: "city", from: "拉萨站", to: "八廓街住宿区", mode: "打车", note: "8.7km / 28分钟。抵达日带行李，直接打车。", color: "#dc2626", routeFile: "拉萨站_八廓街住宿区.json" },
-      { id: "R2", type: "city", from: "八廓街住宿区", to: "布达拉宫", mode: "打车/短步行", note: "约2km。适应期建议打车，减少体力消耗。", color: "#2563eb", routeFile: "八廓街住宿区_布达拉宫.json" },
-      { id: "R3", type: "city", from: "布达拉宫", to: "药王山观景台", mode: "步行", note: "1.4km / 19分钟。身体不舒服就打车。", color: "#7c3aed", routeFile: "布达拉宫_药王山观景台.json" },
-      { id: "R4", type: "city", from: "布达拉宫", to: "大昭寺", mode: "打车", note: "2.0km / 13分钟。减少暴晒步行。", color: "#16a34a", routeFile: "布达拉宫_大昭寺.json" },
-      { id: "R5", type: "city", from: "大昭寺", to: "色拉寺", mode: "打车", note: "6.2km / 24分钟。下午去更顺。", color: "#ea580c", routeFile: "大昭寺_色拉寺.json" },
-      { id: "R6", type: "city", from: "布达拉宫", to: "罗布林卡", mode: "打车", note: "3.0km / 14分钟。轻松日安排。", color: "#0891b2", routeFile: "布达拉宫_罗布林卡.json" },
-      { id: "R7", type: "city", from: "罗布林卡", to: "西藏博物馆", mode: "步行", note: "0.9km / 12分钟。两个点相邻。", color: "#db2777", routeFile: "罗布林卡_西藏博物馆.json" },
-      { id: "R8", type: "remote", from: "八廓街住宿区", to: "羊卓雍措方向", mode: "包车/小团", note: "107km / 约2小时。确认是否含门票、氧气、购物点。", color: "#dc2626", routeFile: "八廓街住宿区_羊卓雍措方向.json" },
-      { id: "R9", type: "remote", from: "八廓街住宿区", to: "纳木错方向", mode: "包车/小团", note: "220km / 约3小时20分以上。海拔更高，身体不好就取消。", color: "#2563eb", routeFile: "八廓街住宿区_纳木错方向.json" }
+      { id: "R1", type: "city", days: ["d3"], from: "拉萨站", to: "八廓街住宿区", mode: "打车", note: "8.7km / 28分钟。抵达日带行李，直接打车。", color: "#dc2626", routeFile: "拉萨站_八廓街住宿区.json" },
+      { id: "R2", type: "city", days: ["d4"], from: "八廓街住宿区", to: "布达拉宫", mode: "打车/短步行", note: "约2km。适应期建议打车，减少体力消耗。", color: "#2563eb", routeFile: "八廓街住宿区_布达拉宫.json" },
+      { id: "R3", type: "city", days: ["d4"], from: "布达拉宫", to: "药王山观景台", mode: "步行", note: "1.4km / 19分钟。身体不舒服就打车。", color: "#7c3aed", routeFile: "布达拉宫_药王山观景台.json" },
+      { id: "R4", type: "city", days: ["d4", "d5"], from: "布达拉宫", to: "大昭寺", mode: "打车", note: "2.0km / 13分钟。减少暴晒步行。", color: "#16a34a", routeFile: "布达拉宫_大昭寺.json" },
+      { id: "R5", type: "city", days: ["d5"], from: "大昭寺", to: "色拉寺", mode: "打车", note: "6.2km / 24分钟。下午去更顺。", color: "#ea580c", routeFile: "大昭寺_色拉寺.json" },
+      { id: "R6", type: "city", days: ["d6"], from: "布达拉宫", to: "罗布林卡", mode: "打车", note: "3.0km / 14分钟。轻松日安排。", color: "#0891b2", routeFile: "布达拉宫_罗布林卡.json" },
+      { id: "R7", type: "city", days: ["d6"], from: "罗布林卡", to: "西藏博物馆", mode: "步行", note: "0.9km / 12分钟。两个点相邻。", color: "#db2777", routeFile: "罗布林卡_西藏博物馆.json" },
+      { id: "R8", type: "remote", days: ["d7"], from: "八廓街住宿区", to: "羊卓雍措方向", mode: "包车/小团", note: "107km / 约2小时。确认是否含门票、氧气、购物点。", color: "#dc2626", routeFile: "八廓街住宿区_羊卓雍措方向.json" },
+      { id: "R9", type: "remote", days: ["d8"], from: "八廓街住宿区", to: "纳木错方向", mode: "包车/小团", note: "220km / 约3小时20分以上。海拔更高，身体不好就取消。", color: "#2563eb", routeFile: "八廓街住宿区_纳木错方向.json" }
     ];
     const spots = [
-      ["布达拉宫", "lhasa_real_maps/attraction_images/布达拉宫.jpg", "拉萨最重要的地标之一，位于红山之上。旺季预约难度最高，务必作为全程第一优先级。", "旺季常见约 200 元/人，必须实名预约。", "住八廓街/大昭寺区域可打车约 2km。"],
-      ["大昭寺与八廓街", "lhasa_real_maps/attraction_images/大昭寺与八廓街.jpg", "大昭寺是拉萨老城精神中心，八廓街围绕大昭寺形成转经道和商业街区。", "大昭寺常见约 70-85 元/人，建议提前 1-3 天确认。", "核心住宿区可步行，身体不适打车。"],
-      ["色拉寺", "lhasa_real_maps/attraction_images/色拉寺.jpg", "格鲁派重要寺院，最有看点的是辩经。下午去更合适。", "常见约 50 元/人，提前查辩经安排。", "从大昭寺打车约 6.2km / 24 分钟。"],
-      ["罗布林卡", "lhasa_real_maps/attraction_images/罗布林卡.jpg", "历代达赖喇嘛夏宫，园林型宫苑，适合安排在轻松日。", "旺季常见约 80 元/人。", "从布达拉宫打车约 3.0km / 14 分钟。"],
-      ["西藏博物馆", "lhasa_real_maps/attraction_images/西藏博物馆.jpg", "适合系统了解西藏历史、宗教艺术与民俗。室内参观强度低。", "通常免费，常需实名预约。", "罗布林卡到西藏博物馆步行约 0.9km / 12 分钟。"],
-      ["羊卓雍措", "lhasa_real_maps/attraction_images/羊卓雍措.jpg", "西藏三大圣湖之一，湖面海拔约 4441 米。比纳木错更适合作为前一段一日游。", "门票/观景台/车辆费用随产品变化。", "八廓街住宿区到羊湖方向约 107km / 约 2 小时。"],
-      ["纳木错", "lhasa_real_maps/attraction_images/纳木错.jpg", "高海拔湖泊，风景开阔但往返距离长。不建议作为必去项。", "门票与一日游价格随线路变化。", "约 220km / 约 3 小时 20 分以上，身体状态优先。"]
+      { name: "布达拉宫", img: "lhasa_real_maps/attraction_images/布达拉宫.jpg", intro: "拉萨最重要的地标之一，位于红山之上。旺季预约难度最高，务必作为全程第一优先级。", ticket: "旺季常见约 200 元/人，必须实名预约。", traffic: "住八廓街/大昭寺区域可打车约 2km。", fit: [["warn", "步行强度中"], ["warn", "台阶较多"], ["good", "晴天最佳"], ["risk", "刚到不建议"]] },
+      { name: "大昭寺与八廓街", img: "lhasa_real_maps/attraction_images/大昭寺与八廓街.jpg", intro: "大昭寺是拉萨老城精神中心，八廓街围绕大昭寺形成转经道和商业街区。", ticket: "大昭寺常见约 70-85 元/人，建议提前 1-3 天确认。", traffic: "核心住宿区可步行，身体不适打车。", fit: [["good", "适合慢走"], ["warn", "人流密集"], ["good", "小雨可去"], ["warn", "注意防晒"]] },
+      { name: "色拉寺", img: "lhasa_real_maps/attraction_images/色拉寺.jpg", intro: "格鲁派重要寺院，最有看点的是辩经。下午去更合适。", ticket: "常见约 50 元/人，提前查辩经安排。", traffic: "从大昭寺打车约 6.2km / 24 分钟。", fit: [["warn", "下午更顺"], ["warn", "步行中等"], ["good", "打车友好"], ["warn", "先查辩经"]] },
+      { name: "罗布林卡", img: "lhasa_real_maps/attraction_images/罗布林卡.jpg", intro: "历代达赖喇嘛夏宫，园林型宫苑，适合安排在轻松日。", ticket: "旺季常见约 80 元/人。", traffic: "从布达拉宫打车约 3.0km / 14 分钟。", fit: [["good", "恢复日首选"], ["good", "强度低"], ["good", "适合拍照"], ["warn", "雨天体验降"]] },
+      { name: "西藏博物馆", img: "lhasa_real_maps/attraction_images/西藏博物馆.jpg", intro: "适合系统了解西藏历史、宗教艺术与民俗。室内参观强度低。", ticket: "通常免费，常需实名预约。", traffic: "罗布林卡到西藏博物馆步行约 0.9km / 12 分钟。", fit: [["good", "室内低强度"], ["good", "雨天友好"], ["good", "适合不适时"], ["warn", "提前预约"]] },
+      { name: "羊卓雍措", img: "lhasa_real_maps/attraction_images/羊卓雍措.jpg", intro: "西藏三大圣湖之一，湖面海拔约 4441 米。比纳木错更适合作为前一段一日游。", ticket: "门票/观景台/车辆费用随产品变化。", traffic: "八廓街住宿区到羊湖方向约 107km / 约 2 小时。", fit: [["warn", "海拔较高"], ["warn", "车程较长"], ["good", "优先于纳木错"], ["risk", "不适就取消"]] },
+      { name: "纳木错", img: "lhasa_real_maps/attraction_images/纳木错.jpg", intro: "高海拔湖泊，风景开阔但往返距离长。不建议作为必去项。", ticket: "门票与一日游价格随线路变化。", traffic: "约 220km / 约 3 小时 20 分以上，身体状态优先。", fit: [["risk", "海拔更高"], ["risk", "往返很累"], ["warn", "天气敏感"], ["risk", "可放弃项"]] }
     ];
     const weatherCities = {
       lhasa: { name: "拉萨", lat: 29.65, lon: 91.13, altitude: "约 3650 米" },
@@ -834,6 +907,25 @@
       ["medicine", "准备高原与常用药", "止痛、肠胃、感冒、晕车、防晒；慢病药带足。"],
       ["weather", "出发前复查天气", "重点看拉萨、羊湖、纳木错的降雨和大风。"]
     ];
+    const countdownItems = [
+      { title: "抢 7/1 火车票", date: "2026-06-17", note: "优先 Z164 硬卧/软卧，失败就立刻看西宁/重庆中转。" },
+      { title: "确认可取消酒店", date: "2026-06-20", note: "先锁核心区可取消房，后续再比价升级。" },
+      { title: "开始关注布达拉宫预约", date: "2026-06-24", note: "旺季最关键，约到哪天就围绕哪天调整行程。" },
+      { title: "确认羊湖/纳木错车辆", date: "2026-06-28", note: "问清氧气、门票、购物点、取消政策。" },
+      { title: "出发前天气复查", date: "2026-06-30", note: "重点看拉萨、羊湖、纳木错降雨和大风。" },
+      { title: "福州出发", date: "2026-07-01", note: "身份证、车票、药品、充电宝和外套最后复核。" }
+    ];
+    const routeFilters = [
+      { id: "all", label: "全部路线", routeIds: routes.map(route => route.id) },
+      { id: "d3", label: "Day 3 抵达", routeIds: ["R1"] },
+      { id: "d4", label: "Day 4 布宫", routeIds: ["R2", "R3", "R4"] },
+      { id: "d5", label: "Day 5 老城", routeIds: ["R4", "R5"] },
+      { id: "d6", label: "Day 6 恢复", routeIds: ["R6", "R7"] },
+      { id: "d7", label: "Day 7 羊湖", routeIds: ["R8"] },
+      { id: "d8", label: "Day 8 纳木错", routeIds: ["R9"] },
+      { id: "remote", label: "只看远郊", routeIds: ["R8", "R9"] }
+    ];
+    let currentBudgetTotal = 0;
 
     function amapNavUrl(route) {
       const a = pois[route.from], b = pois[route.to];
@@ -880,7 +972,7 @@
         lineJoin: "round",
         dashArray: route.mode.includes("步行") ? "8 9" : null
       }).bindPopup(routePopup(route)).addTo(routeLayer);
-      routeObjects[route.id] = L.featureGroup([halo, line]);
+      routeObjects[route.id] = { group: L.featureGroup([halo, line]), route, arrows: [] };
       addRouteArrows(route, points);
     }
 
@@ -899,7 +991,7 @@
         const prev = points[index - 1];
         const current = points[index];
         const angle = Math.atan2(current[0] - prev[0], current[1] - prev[1]) * 180 / Math.PI;
-        L.marker(current, {
+        const arrow = L.marker(current, {
           interactive: false,
           icon: L.divIcon({
             className: "route-arrow-wrap",
@@ -908,6 +1000,7 @@
             iconAnchor: [11, 11]
           })
         }).addTo(arrowLayer);
+        if (routeObjects[route.id]) routeObjects[route.id].arrows.push(arrow);
       });
     }
 
@@ -941,14 +1034,15 @@
         ? "已加载 R1-R9 真实导航折线路径，彩色箭头表示行进方向。"
         : `已加载 ${realCount}/${routes.length} 条真实导航路径，其余使用直线兜底。`;
       fitCity();
+      applyRouteFilter("all");
     }
 
     function routeCard(route) {
-      return `<div class="route-card"><div><span class="tag" style="background:${route.color}">${route.id}</span></div><div><div class="route-title">${route.from} → ${route.to}</div><div class="route-note">${route.mode}｜${route.note}</div><div class="route-actions"><button onclick="focusRoute('${route.id}')">定位</button><a class="btn" href="${amapNavUrl(route)}" target="_blank">高德导航</a></div></div></div>`;
+      return `<div class="route-card" data-route-id="${route.id}"><div><span class="tag" style="background:${route.color}">${route.id}</span></div><div><div class="route-title">${route.from} → ${route.to}</div><div class="route-note">${route.mode}｜${route.note}</div><div class="route-actions"><button onclick="focusRoute('${route.id}')">定位</button><a class="btn" href="${amapNavUrl(route)}" target="_blank">高德导航</a></div></div></div>`;
     }
     document.getElementById("cityRoutes").innerHTML = routes.filter(r => r.type === "city").map(routeCard).join("");
     document.getElementById("remoteRoutes").innerHTML = routes.filter(r => r.type === "remote").map(routeCard).join("");
-    document.getElementById("spotGrid").innerHTML = spots.map(([name, img, intro, ticket, traffic]) => `<article class="spot"><img src="${img}" alt="${name}"><div class="spot-body"><h3>${name}</h3><dl><div><dt>介绍</dt><dd>${intro}</dd></div><div><dt>门票/预约</dt><dd>${ticket}</dd></div><div><dt>交通</dt><dd>${traffic}</dd></div></dl></div></article>`).join("");
+    document.getElementById("spotGrid").innerHTML = spots.map(spot => `<article class="spot"><img src="${spot.img}" alt="${spot.name}"><div class="spot-body"><h3>${spot.name}</h3><dl><div><dt>介绍</dt><dd>${spot.intro}</dd></div><div><dt>门票/预约</dt><dd>${spot.ticket}</dd></div><div><dt>交通</dt><dd>${spot.traffic}</dd></div></dl><div class="fit-tags">${spot.fit.map(([level, text]) => `<span class="fit-tag ${level}">${text}</span>`).join("")}</div></div></article>`).join("");
     const money = new Intl.NumberFormat("zh-CN");
 
     function weatherLabel(code) {
@@ -1092,7 +1186,7 @@
     }
 
     function setupBudget() {
-      const ids = ["peopleInput", "nightsInput", "roomInput", "roomsInput", "foodInput", "trainInput", "ticketInput", "remoteInput"];
+      const ids = ["peopleInput", "nightsInput", "roomInput", "roomsInput", "foodInput", "trainInput", "ticketInput", "remoteInput", "payerAInput", "payerBInput", "payerCInput", "splitPeopleInput"];
       ids.forEach(id => document.getElementById(id).addEventListener("input", updateBudget));
       updateBudget();
     }
@@ -1116,24 +1210,75 @@
       const ticketTotal = people * ticket;
       const cityTraffic = people <= 3 ? 600 : 900;
       const total = hotelTotal + foodTotal + trainTotal + ticketTotal + remote + cityTraffic;
+      currentBudgetTotal = total;
       document.getElementById("budgetResult").innerHTML = `
         预计总额：${money.format(Math.round(total))} 元
         <small>人均约 ${money.format(Math.round(total / people))} 元。含住宿 ${money.format(hotelTotal)}、餐饮 ${money.format(foodTotal)}、大交通 ${money.format(trainTotal)}、门票 ${money.format(ticketTotal)}、远郊 ${money.format(remote)}、市内交通 ${money.format(cityTraffic)}。</small>
       `;
+      updateSplit();
+    }
+
+    function updateSplit() {
+      const splitPeople = Math.max(1, numberValue("splitPeopleInput"));
+      const names = ["甲", "乙", "丙"];
+      const paid = [numberValue("payerAInput"), numberValue("payerBInput"), numberValue("payerCInput")];
+      const share = currentBudgetTotal / splitPeople;
+      document.getElementById("splitResult").innerHTML = paid.map((amount, index) => {
+        const balance = amount - share;
+        const text = balance >= 0 ? `应收 ${money.format(Math.round(balance))} 元` : `还需补 ${money.format(Math.round(Math.abs(balance)))} 元`;
+        return `<div class="split-item"><strong><span>${names[index]}</span><span>${text}</span></strong><span>已垫付 ${money.format(Math.round(amount))} 元；按当前预算人均 ${money.format(Math.round(share))} 元计算。</span></div>`;
+      }).join("");
+    }
+
+    function setupCountdown() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      document.getElementById("countdownList").innerHTML = countdownItems.map(item => {
+        const target = new Date(`${item.date}T00:00:00+08:00`);
+        const days = Math.ceil((target - today) / 86400000);
+        const label = days > 0 ? `还有 ${days} 天` : days === 0 ? "今天" : `已过 ${Math.abs(days)} 天`;
+        return `<div class="countdown-item"><strong><span>${item.title}</span><span>${label}</span></strong><span>${item.date}｜${item.note}</span></div>`;
+      }).join("");
+    }
+
+    function setupRouteFilters() {
+      const wrap = document.getElementById("routeFilters");
+      wrap.innerHTML = routeFilters.map(filter => `<button type="button" data-route-filter="${filter.id}">${filter.label}</button>`).join("");
+      wrap.querySelectorAll("[data-route-filter]").forEach(btn => {
+        btn.addEventListener("click", () => applyRouteFilter(btn.dataset.routeFilter));
+      });
+    }
+
+    function setRouteVisible(routeId, visible) {
+      const entry = routeObjects[routeId];
+      if (!entry) return;
+      entry.group.getLayers().forEach(layer => visible ? layer.addTo(routeLayer) : routeLayer.removeLayer(layer));
+      entry.arrows.forEach(arrow => visible ? arrow.addTo(arrowLayer) : arrowLayer.removeLayer(arrow));
+    }
+
+    function applyRouteFilter(filterId) {
+      const filter = routeFilters.find(item => item.id === filterId) || routeFilters[0];
+      const visible = new Set(filter.routeIds);
+      routes.forEach(route => setRouteVisible(route.id, visible.has(route.id)));
+      document.querySelectorAll("[data-route-filter]").forEach(btn => btn.classList.toggle("active", btn.dataset.routeFilter === filter.id));
+      document.querySelectorAll("[data-route-id]").forEach(card => card.style.display = visible.has(card.dataset.routeId) ? "" : "none");
+      const visibleRoutes = routes.filter(route => visible.has(route.id));
+      if (visibleRoutes.length) map.fitBounds(boundsFor(visibleRoutes), { padding: [80, 80], maxZoom: filter.id === "all" ? undefined : 14 });
     }
 
     function focusRoute(id) {
-      const line = routeObjects[id];
-      if (!line) return;
-      map.fitBounds(line.getBounds(), { padding: [90, 90], maxZoom: 15 });
-      line.openPopup();
+      const entry = routeObjects[id];
+      if (!entry) return;
+      map.fitBounds(entry.group.getBounds(), { padding: [90, 90], maxZoom: 15 });
+      const line = entry.group.getLayers()[1];
+      if (line) line.openPopup();
     }
     function boundsFor(list) {
       const pts = [];
       list.forEach(r => {
-        const routeGroup = routeObjects[r.id];
-        if (routeGroup) {
-          routeGroup.getLayers().forEach(layer => pts.push(...layer.getLatLngs()));
+        const entry = routeObjects[r.id];
+        if (entry) {
+          entry.group.getLayers().forEach(layer => pts.push(...layer.getLatLngs()));
         } else {
           pts.push(pois[r.from], pois[r.to]);
         }
@@ -1147,6 +1292,8 @@
     setupPlanner();
     setupChecklist();
     setupBudget();
+    setupCountdown();
+    setupRouteFilters();
     drawRoutes();
   </script>
 </body>
