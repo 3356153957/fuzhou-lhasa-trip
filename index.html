@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>福州到拉萨旅游攻略 2026-07-01</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f766e'/%3E%3Cpath d='M12 45 28 19l10 15 6-9 8 20H12Z' fill='%23fff7e8'/%3E%3Ccircle cx='46' cy='16' r='5' fill='%23f1c36d'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --paper: #f3f6f4;
+      --ink: #1f2933;
+      --muted: #5b6472;
+      --line: #cfdad4;
+      --panel: #ffffff;
+      --white: #ffffff;
+      --soft: #eef5f2;
+      --warm: #fff7e8;
+      --accent: #0f766e;
+      --accent-dark: #134e4a;
+      --red: #dc2626;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --green: #16a34a;
+      --orange: #ea580c;
+      --cyan: #0891b2;
+      --pink: #db2777;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    a { color: #0b63ce; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hero {
+      min-height: 68vh;
+      display: grid;
+      align-items: end;
+      padding: 34px clamp(18px, 5vw, 72px);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.62)),
+        url("lhasa_real_maps/attraction_images/布达拉宫.jpg") center/cover no-repeat;
+      color: white;
+    }
+    .hero h1 {
+      max-width: 980px;
+      margin: 0 0 12px;
+      font-size: clamp(34px, 6vw, 72px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .hero p {
+      max-width: 900px;
+      margin: 0 0 22px;
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.6;
+      color: rgba(255,255,255,.96);
+      text-shadow: 0 2px 12px rgba(0,0,0,.55);
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .hero-meta span {
+      border: 1px solid rgba(255,255,255,.45);
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      padding: 8px 11px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .hero-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 13px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.93);
+      color: #1f2933;
+      font-weight: 700;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 3vw, 40px) 64px;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow: auto;
+      padding: 18px 0;
+    }
+    nav a {
+      display: block;
+      color: #344054;
+      padding: 9px 10px;
+      border-left: 3px solid transparent;
+      font-size: 14px;
+    }
+    nav a:hover { background: #e6f3ef; border-left-color: var(--accent); text-decoration: none; }
+    main { min-width: 0; }
+    section {
+      padding: 26px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+    h3 { margin: 22px 0 10px; font-size: 20px; }
+    p { color: var(--muted); line-height: 1.75; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .stat, .panel, .route-card, .spot, .day, .tool-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .stat { grid-column: span 3; padding: 15px; }
+    .stat b { display: block; font-size: 24px; margin-bottom: 4px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .panel { padding: 18px; }
+    .map-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+      min-height: 720px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .map-side {
+      overflow: auto;
+      max-height: 720px;
+      padding: 16px;
+      border-right: 1px solid var(--line);
+      background: #f6faf8;
+    }
+    #map { min-height: 720px; width: 100%; }
+    .route-card {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      padding: 10px;
+      margin: 9px 0;
+      background: #fff;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 30px;
+      color: white;
+      border-radius: 7px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .route-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+    .route-note { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .route-actions { display: flex; gap: 7px; margin-top: 8px; flex-wrap: wrap; }
+    .route-status {
+      margin-top: 10px;
+      padding: 9px;
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    button, .btn {
+      border: 1px solid #aac8bd;
+      background: #fff;
+      color: #24313f;
+      border-radius: 6px;
+      padding: 7px 9px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+    }
+    button:hover, .btn:hover { background: #e6f3ef; text-decoration: none; }
+    button.active, .btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #deceb0;
+      padding: 10px;
+      vertical-align: top;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+    th {
+      background: #e4eee9;
+      color: #1f3430;
+      text-align: left;
+      font-size: 14px;
+    }
+    td { font-size: 14px; color: #384250; }
+    .spots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .spot { overflow: hidden; background: #fff; }
+    .spot img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      background: #e9dfce;
+    }
+    .spot-body { padding: 14px; }
+    .spot h3 { margin-top: 0; }
+    .spot dl { margin: 0; display: grid; gap: 8px; }
+    .spot dt { font-weight: 800; }
+    .spot dd { margin: 2px 0 0; color: var(--muted); line-height: 1.65; }
+    .days { display: grid; gap: 12px; }
+    .day { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px; background: #fff; }
+    .day b { font-size: 18px; }
+    .day p { margin: 0; }
+    .notice {
+      background: #fff7e8;
+      border: 1px solid #f1c36d;
+      border-radius: 8px;
+      padding: 12px;
+      color: #5c4813;
+    }
+    .leaflet-popup-content { font-family: "Microsoft YaHei", Arial, sans-serif; min-width: 220px; }
+    .popup-title { font-weight: 800; margin-bottom: 6px; }
+    .popup-note { color: #4b5563; line-height: 1.45; }
+    .route-arrow {
+      color: inherit;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 18px;
+      text-shadow: 0 1px 3px rgba(255,255,255,.95), 0 -1px 3px rgba(255,255,255,.95), 1px 0 3px rgba(255,255,255,.95), -1px 0 3px rgba(255,255,255,.95);
+      transform-origin: center;
+    }
+    .print-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tool-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .tool-card {
+      padding: 16px;
+      min-width: 0;
+    }
+    .tool-card h3 {
+      margin: 0 0 10px;
+    }
+    .tool-card p {
+      margin: 6px 0 12px;
+    }
+    .weather-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: var(--soft);
+      min-height: 118px;
+    }
+    .weather-now {
+      font-size: clamp(34px, 5vw, 50px);
+      line-height: 1;
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+    .weather-meta {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .weather-tabs, .day-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 12px 0;
+    }
+    .forecast {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(86px, 1fr));
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .forecast-day {
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      min-width: 86px;
+    }
+    .forecast-day strong {
+      display: block;
+      color: #24313f;
+      margin-bottom: 6px;
+    }
+    .forecast-day span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .planner-panel {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .planner-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 800;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e6f3ef;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .planner-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #384250;
+      line-height: 1.65;
+    }
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .result-box {
+      min-height: 52px;
+      border-radius: 8px;
+      border: 1px solid #d8e4df;
+      background: #f8fbfa;
+      padding: 10px;
+      color: #344054;
+      line-height: 1.6;
+    }
+    .checklist {
+      display: grid;
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .check-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 9px;
+      align-items: start;
+      padding: 9px;
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .check-item input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+    }
+    .check-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+    .progress-shell {
+      height: 9px;
+      border-radius: 999px;
+      background: #dfe9e4;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+    .calculator {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    label.field {
+      display: grid;
+      gap: 5px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .field input, .field select {
+      width: 100%;
+      border: 1px solid #bdd0c8;
+      border-radius: 6px;
+      padding: 8px 9px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    .budget-total {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #e6f3ef;
+      color: var(--accent-dark);
+      font-weight: 800;
+      line-height: 1.5;
+    }
+    .budget-total small {
+      display: block;
+      color: #42605a;
+      font-weight: 400;
+      margin-top: 4px;
+    }
+    .source-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); padding: 0; }
+      .stat { grid-column: span 6; }
+      .map-grid { grid-template-columns: 1fr; }
+      .map-side { max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+      #map { min-height: 520px; }
+      .tool-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .stat { grid-column: span 12; }
+      .day { grid-template-columns: 1fr; }
+      th, td { font-size: 12px; padding: 8px; }
+      .weather-head { grid-template-columns: 1fr; }
+      .calculator { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <div class="hero-meta">
+        <span>2026-07-01 出发</span>
+        <span>3 人</span>
+        <span>火车进藏</span>
+        <span>首选上海 Z164</span>
+      </div>
+      <h1>福州到拉萨旅游攻略</h1>
+      <p>把大交通、酒店、门票预约、每日行程、景点图片和可缩放高德地图整合到一个网页里。PDF/Word 适合打印，这个页面适合真正看路线。</p>
+      <div class="hero-links">
+        <a href="#map-section">查看交互地图</a>
+        <a href="#daily">每日行程</a>
+        <a href="福州到拉萨旅游攻略_2026-07-01_真实地图版.pdf">打开 PDF</a>
+        <a href="福州到拉萨旅游攻略_2026-07-01_真实地图版.docx">打开 Word</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+        <a href="#overview">总览</a>
+        <a href="#trip-tools">互动工具</a>
+        <a href="#map-section">交互地图</a>
+        <a href="#transport">大交通</a>
+      <a href="#hotel">酒店</a>
+      <a href="#tickets">门票预约</a>
+      <a href="#spots">景点图文</a>
+      <a href="#daily">每日行程</a>
+      <a href="#budget">预算风险</a>
+      <a href="#files">文件</a>
+    </nav>
+
+    <main>
+      <section id="overview">
+        <h2>一眼看懂</h2>
+        <div class="grid">
+          <div class="stat"><b>9 天</b><span>含火车 2 晚，拉萨 6 晚</span></div>
+          <div class="stat"><b>Z164</b><span>上海站 18:33 发，7/3 15:36 到拉萨</span></div>
+          <div class="stat"><b>6.17</b><span>预计抢 7/1 车票，优先卧铺</span></div>
+          <div class="stat"><b>R1-R9</b><span>小交通路线全部在地图中可点选</span></div>
+        </div>
+        <p class="notice">核心策略：先抢 Z164 硬卧/软卧，再围绕布达拉宫预约调整市内日期。纳木错不是硬性必去项，身体状态不好就取消。</p>
+      </section>
+
+      <section id="trip-tools">
+        <h2>旅行互动台</h2>
+        <div class="tool-grid">
+          <article class="tool-card">
+            <h3>实时天气与出行判断</h3>
+            <div class="weather-tabs">
+              <button type="button" class="active" data-weather-city="lhasa">拉萨</button>
+              <button type="button" data-weather-city="fuzhou">福州</button>
+              <button type="button" data-weather-city="shanghai">上海</button>
+            </div>
+            <div class="weather-head">
+              <div>
+                <div class="weather-now" id="weatherNow">读取中</div>
+                <div class="weather-meta" id="weatherMeta"></div>
+              </div>
+              <div class="result-box" id="weatherAdvice">正在获取天气，稍等一下。</div>
+            </div>
+            <div class="forecast" id="forecast"></div>
+            <p class="source-note">天气来自 Open-Meteo 在线预报。7 月进藏前再看一次实际天气；本页会在联网时自动刷新。</p>
+          </article>
+
+          <article class="tool-card">
+            <h3>预约与准备进度</h3>
+            <div class="progress-shell"><div class="progress-bar" id="prepProgress"></div></div>
+            <p id="prepText">0/0 已完成</p>
+            <div class="checklist" id="prepChecklist"></div>
+          </article>
+        </div>
+
+        <div class="tool-grid" style="margin-top:16px;">
+          <article class="tool-card">
+            <h3>每日行程决策</h3>
+            <div class="day-tabs" id="plannerTabs"></div>
+            <div class="planner-panel">
+              <div class="planner-title">
+                <span id="plannerTitle"></span>
+                <span class="pill" id="plannerPill"></span>
+              </div>
+              <ul class="planner-list" id="plannerList"></ul>
+              <div>
+                <strong>当天怎么选</strong>
+                <div class="choice-row" id="plannerChoices"></div>
+              </div>
+              <div class="result-box" id="plannerResult"></div>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <h3>预算快速计算</h3>
+            <div class="calculator">
+              <label class="field">人数<input id="peopleInput" type="number" min="1" value="3"></label>
+              <label class="field">住宿晚数<input id="nightsInput" type="number" min="1" value="6"></label>
+              <label class="field">每晚房费/间<input id="roomInput" type="number" min="0" value="450"></label>
+              <label class="field">房间数<input id="roomsInput" type="number" min="1" value="2"></label>
+              <label class="field">餐饮/人/天<input id="foodInput" type="number" min="0" value="140"></label>
+              <label class="field">大交通/人<input id="trainInput" type="number" min="0" value="1600"></label>
+              <label class="field">门票/人<input id="ticketInput" type="number" min="0" value="500"></label>
+              <label class="field">远郊游总额<input id="remoteInput" type="number" min="0" value="3200"></label>
+            </div>
+            <div class="budget-total" id="budgetResult"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="map-section">
+        <h2>可缩放高德地图</h2>
+        <p>地图可以拖动、滚轮缩放。侧边栏每段路线都有“定位”和“高德导航”。本地彩色线用于看清点位关系，真实逐路导航请点“高德导航”。</p>
+        <div class="map-grid">
+          <div class="map-side">
+            <div class="toolbar">
+              <button onclick="fitAll()">查看全部</button>
+              <button onclick="fitCity()">只看市内</button>
+              <button onclick="fitRemote()">只看远郊</button>
+            </div>
+            <h3>市内小交通</h3>
+            <div id="cityRoutes"></div>
+            <h3>远郊一日游</h3>
+            <div id="remoteRoutes"></div>
+            <div class="route-status" id="routeStatus">正在读取真实导航线路。</div>
+          </div>
+          <div id="map"></div>
+        </div>
+      </section>
+
+      <section id="transport">
+        <h2>大交通明细</h2>
+        <table>
+          <thead><tr><th>日期</th><th>区间</th><th>车次</th><th>时间</th><th>席别目标</th><th>单人样本</th><th>3 人小计</th></tr></thead>
+          <tbody>
+            <tr><td>7/1</td><td>福州到上海</td><td>G256</td><td>09:33-13:17</td><td>二等座</td><td>431 元</td><td>1293 元</td></tr>
+            <tr><td>7/1-7/3</td><td>上海到拉萨</td><td>Z164</td><td>18:33-7/3 15:36</td><td>硬卧/软卧</td><td>硬座样本 402.5 元</td><td>硬座口径 1207.5 元</td></tr>
+          </tbody>
+        </table>
+        <p>执行重点：Z164 只建议抢硬卧或软卧。若只剩硬座，不建议硬扛 45 小时进藏，改走重庆 Z223 或西宁中转更稳。</p>
+      </section>
+
+      <section id="hotel">
+        <h2>酒店价格明细</h2>
+        <table>
+          <thead><tr><th>住宿选择</th><th>位置</th><th>价格样本/预算</th><th>适合度</th><th>预订要点</th></tr></thead>
+          <tbody>
+            <tr><td>飞猪低价样本</td><td>布宫/八廓街附近</td><td>32-69 元起</td><td>仅作底线参考</td><td>不建议三人舒适游作为主住处</td></tr>
+            <tr><td>中档酒店</td><td>八廓街-大昭寺-布宫之间</td><td>300-600 元/间夜</td><td>推荐</td><td>订 2 间可取消房，6 晚约 3600-7200 元</td></tr>
+            <tr><td>家庭房/三人间</td><td>核心区</td><td>约 400-800 元/晚</td><td>可选</td><td>确认独卫、电梯、供氧、取消政策</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="tickets">
+        <h2>景区门票与预约</h2>
+        <table>
+          <thead><tr><th>景区</th><th>票价参考</th><th>预约/预订</th><th>提前量</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>布达拉宫</td><td>旺季常见约 200 元/人，3 人约 600 元</td><td>必须实名预约</td><td>至少 7 天持续关注</td><td>全程最难约，约到哪天就围绕它调整</td></tr>
+            <tr><td>大昭寺</td><td>约 70-85 元/人</td><td>常实行预约/购票制</td><td>1-3 天</td><td>建议上午参观</td></tr>
+            <tr><td>罗布林卡</td><td>旺季常见约 80 元/人</td><td>建议线上查票</td><td>1-3 天</td><td>适合轻松日</td></tr>
+            <tr><td>西藏博物馆</td><td>通常免费</td><td>常需实名预约</td><td>1-3 天</td><td>室内低强度</td></tr>
+            <tr><td>色拉寺</td><td>常见约 50 元/人</td><td>查开放和辩经安排</td><td>1 天</td><td>下午更合适</td></tr>
+            <tr><td>羊卓雍措</td><td>随车型和产品变化</td><td>提前订车/小团</td><td>3-5 天</td><td>确认是否含氧气、门票、购物点</td></tr>
+            <tr><td>纳木错</td><td>随线路变化</td><td>提前订车/小团</td><td>3-5 天</td><td>海拔更高，视身体状态决定</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="spots">
+        <h2>景点图文介绍</h2>
+        <div class="spots" id="spotGrid"></div>
+      </section>
+
+      <section id="daily">
+        <h2>每日行程</h2>
+        <div class="days">
+          <div class="day"><b>Day 1<br>7/1</b><p>福州到上海，上海虹桥跨站到上海站，乘 Z164 进藏。三人带行李建议打车，不建议地铁换乘折腾。</p></div>
+          <div class="day"><b>Day 2<br>7/2</b><p>全天火车。减少走动，别饮酒，别熬夜。经过高海拔区前后以休息为主。</p></div>
+          <div class="day"><b>Day 3<br>7/3</b><p>15:36 到拉萨站。按 R1 打车到八廓街住宿区，晚上只做低强度活动。</p></div>
+          <div class="day"><b>Day 4<br>7/4</b><p>布达拉宫、药王山观景台、布达拉宫广场。布宫约不到则用罗布林卡/博物馆替换。</p></div>
+          <div class="day"><b>Day 5<br>7/5</b><p>上午大昭寺和八廓街，下午按 R5 打车去色拉寺，看辩经安排。</p></div>
+          <div class="day"><b>Day 6<br>7/6</b><p>罗布林卡、西藏博物馆。这天强度低，适合作为恢复日。</p></div>
+          <div class="day"><b>Day 7<br>7/7</b><p>羊卓雍措一日游。建议小团或包车，提前问清门票、氧气、无人机、购物点。</p></div>
+          <div class="day"><b>Day 8<br>7/8</b><p>纳木错或休整。若有人头痛、胸闷或失眠，取消纳木错。</p></div>
+          <div class="day"><b>Day 9<br>7/9</b><p>机动日，用于补布宫预约失败、购物、邮寄行李、返程准备。</p></div>
+        </div>
+      </section>
+
+      <section id="budget">
+        <h2>预算与风险</h2>
+        <table>
+          <thead><tr><th>项目</th><th>低估</th><th>舒适估算</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>大交通进藏</td><td>约 2500 元</td><td>约 4300-5800 元</td><td>低估为 Z164 硬座口径，实际应按卧铺预算</td></tr>
+            <tr><td>拉萨住宿 6 晚</td><td>3600 元</td><td>7200 元</td><td>2 间中档可取消房</td></tr>
+            <tr><td>市内交通</td><td>300 元</td><td>600 元</td><td>三人同车，按多次短途</td></tr>
+            <tr><td>市内门票</td><td>1200 元</td><td>1500 元</td><td>布宫、大昭寺、罗布林卡、色拉寺等</td></tr>
+            <tr><td>羊湖/纳木错</td><td>2100 元</td><td>4200 元</td><td>取决于小团/包车和是否含门票氧气</td></tr>
+            <tr><td>餐饮</td><td>1800 元</td><td>3000 元</td><td>约 100-170 元/人/天</td></tr>
+          </tbody>
+        </table>
+        <p class="notice">主要风险：Z164 卧铺票、布达拉宫预约、纳木错高海拔疲劳、旺季酒店涨价。处理原则：先抢卧铺和布宫；纳木错永远服从身体状态；酒店先订可取消。</p>
+      </section>
+
+      <section id="files">
+        <h2>相关文件</h2>
+        <div class="print-links">
+          <a class="btn" href="福州到拉萨旅游攻略_2026-07-01_真实地图版.pdf">PDF 打印版</a>
+          <a class="btn" href="福州到拉萨旅游攻略_2026-07-01_真实地图版.docx">Word 可编辑版</a>
+          <a class="btn" href="lhasa_real_maps/拉萨市内小交通真实地图.png">市内地图图片</a>
+          <a class="btn" href="lhasa_real_maps/拉萨远郊一日游真实地图.png">远郊地图图片</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const pois = {
+      "拉萨站": [29.623017, 91.070434],
+      "八廓街住宿区": [29.651169, 91.131357],
+      "布达拉宫": [29.654471, 91.118463],
+      "药王山观景台": [29.652221, 91.115081],
+      "大昭寺": [29.650209, 91.132802],
+      "色拉寺": [29.695223, 91.134823],
+      "罗布林卡": [29.651619, 91.092479],
+      "西藏博物馆": [29.648382, 91.098894],
+      "羊卓雍措方向": [29.190499, 90.619242],
+      "纳木错方向": [30.786294, 91.111199]
+    };
+    const routes = [
+      { id: "R1", type: "city", from: "拉萨站", to: "八廓街住宿区", mode: "打车", note: "8.7km / 28分钟。抵达日带行李，直接打车。", color: "#dc2626", routeFile: "拉萨站_八廓街住宿区.json" },
+      { id: "R2", type: "city", from: "八廓街住宿区", to: "布达拉宫", mode: "打车/短步行", note: "约2km。适应期建议打车，减少体力消耗。", color: "#2563eb", routeFile: "八廓街住宿区_布达拉宫.json" },
+      { id: "R3", type: "city", from: "布达拉宫", to: "药王山观景台", mode: "步行", note: "1.4km / 19分钟。身体不舒服就打车。", color: "#7c3aed", routeFile: "布达拉宫_药王山观景台.json" },
+      { id: "R4", type: "city", from: "布达拉宫", to: "大昭寺", mode: "打车", note: "2.0km / 13分钟。减少暴晒步行。", color: "#16a34a", routeFile: "布达拉宫_大昭寺.json" },
+      { id: "R5", type: "city", from: "大昭寺", to: "色拉寺", mode: "打车", note: "6.2km / 24分钟。下午去更顺。", color: "#ea580c", routeFile: "大昭寺_色拉寺.json" },
+      { id: "R6", type: "city", from: "布达拉宫", to: "罗布林卡", mode: "打车", note: "3.0km / 14分钟。轻松日安排。", color: "#0891b2", routeFile: "布达拉宫_罗布林卡.json" },
+      { id: "R7", type: "city", from: "罗布林卡", to: "西藏博物馆", mode: "步行", note: "0.9km / 12分钟。两个点相邻。", color: "#db2777", routeFile: "罗布林卡_西藏博物馆.json" },
+      { id: "R8", type: "remote", from: "八廓街住宿区", to: "羊卓雍措方向", mode: "包车/小团", note: "107km / 约2小时。确认是否含门票、氧气、购物点。", color: "#dc2626", routeFile: "八廓街住宿区_羊卓雍措方向.json" },
+      { id: "R9", type: "remote", from: "八廓街住宿区", to: "纳木错方向", mode: "包车/小团", note: "220km / 约3小时20分以上。海拔更高，身体不好就取消。", color: "#2563eb", routeFile: "八廓街住宿区_纳木错方向.json" }
+    ];
+    const spots = [
+      ["布达拉宫", "lhasa_real_maps/attraction_images/布达拉宫.jpg", "拉萨最重要的地标之一，位于红山之上。旺季预约难度最高，务必作为全程第一优先级。", "旺季常见约 200 元/人，必须实名预约。", "住八廓街/大昭寺区域可打车约 2km。"],
+      ["大昭寺与八廓街", "lhasa_real_maps/attraction_images/大昭寺与八廓街.jpg", "大昭寺是拉萨老城精神中心，八廓街围绕大昭寺形成转经道和商业街区。", "大昭寺常见约 70-85 元/人，建议提前 1-3 天确认。", "核心住宿区可步行，身体不适打车。"],
+      ["色拉寺", "lhasa_real_maps/attraction_images/色拉寺.jpg", "格鲁派重要寺院，最有看点的是辩经。下午去更合适。", "常见约 50 元/人，提前查辩经安排。", "从大昭寺打车约 6.2km / 24 分钟。"],
+      ["罗布林卡", "lhasa_real_maps/attraction_images/罗布林卡.jpg", "历代达赖喇嘛夏宫，园林型宫苑，适合安排在轻松日。", "旺季常见约 80 元/人。", "从布达拉宫打车约 3.0km / 14 分钟。"],
+      ["西藏博物馆", "lhasa_real_maps/attraction_images/西藏博物馆.jpg", "适合系统了解西藏历史、宗教艺术与民俗。室内参观强度低。", "通常免费，常需实名预约。", "罗布林卡到西藏博物馆步行约 0.9km / 12 分钟。"],
+      ["羊卓雍措", "lhasa_real_maps/attraction_images/羊卓雍措.jpg", "西藏三大圣湖之一，湖面海拔约 4441 米。比纳木错更适合作为前一段一日游。", "门票/观景台/车辆费用随产品变化。", "八廓街住宿区到羊湖方向约 107km / 约 2 小时。"],
+      ["纳木错", "lhasa_real_maps/attraction_images/纳木错.jpg", "高海拔湖泊，风景开阔但往返距离长。不建议作为必去项。", "门票与一日游价格随线路变化。", "约 220km / 约 3 小时 20 分以上，身体状态优先。"]
+    ];
+    const weatherCities = {
+      lhasa: { name: "拉萨", lat: 29.65, lon: 91.13, altitude: "约 3650 米" },
+      fuzhou: { name: "福州", lat: 26.08, lon: 119.30, altitude: "近海低海拔" },
+      shanghai: { name: "上海", lat: 31.23, lon: 121.47, altitude: "近海低海拔" }
+    };
+    const weatherCodes = {
+      0: "晴", 1: "大部晴朗", 2: "多云", 3: "阴",
+      45: "雾", 48: "雾凇",
+      51: "小毛毛雨", 53: "毛毛雨", 55: "较强毛毛雨",
+      61: "小雨", 63: "中雨", 65: "大雨",
+      71: "小雪", 73: "中雪", 75: "大雪",
+      80: "阵雨", 81: "较强阵雨", 82: "强阵雨",
+      95: "雷雨", 96: "雷雨伴冰雹", 99: "强雷雨伴冰雹"
+    };
+    const tripDays = [
+      {
+        id: "d1",
+        label: "7/1",
+        title: "福州到上海，转 Z164 进藏",
+        tag: "换乘日",
+        tasks: ["G256 到上海虹桥后预留跨站时间", "三人带行李建议打车到上海站", "上车前备好水、充电宝、常用药"],
+        choices: [
+          ["行李多", "直接打车跨站，别为了省几十元消耗体力。"],
+          ["时间紧", "优先保证到上海站，晚饭用车站简餐解决。"],
+          ["车票变动", "Z164 卧铺没抢到时，优先看西宁或重庆中转。"]
+        ]
+      },
+      {
+        id: "d3",
+        label: "7/3",
+        title: "抵达拉萨，只做低强度适应",
+        tag: "适应日",
+        tasks: ["15:36 到拉萨站后按 R1 打车去酒店", "晚餐清淡，避免饮酒和洗太久热水澡", "只在酒店周边短走，不安排正式景点"],
+        choices: [
+          ["状态好", "可以在八廓街外围短走 30-45 分钟，但不要兴奋加码。"],
+          ["头痛失眠", "取消夜游，补水休息；症状明显时及时就医。"],
+          ["下雨", "只处理入住和吃饭，第二天再开始市内景点。"]
+        ]
+      },
+      {
+        id: "d4",
+        label: "7/4",
+        title: "布达拉宫优先日",
+        tag: "预约核心",
+        tasks: ["按预约时间提前到达", "布宫后去药王山观景台", "傍晚可看布达拉宫广场"],
+        choices: [
+          ["约到布宫", "维持原计划，午后减少暴晒步行。"],
+          ["没约到", "切换到罗布林卡 + 西藏博物馆，把布宫挪到机动日。"],
+          ["身体一般", "只做布宫一个重点，取消药王山和广场。"]
+        ]
+      },
+      {
+        id: "d5",
+        label: "7/5",
+        title: "大昭寺、八廓街、色拉寺",
+        tag: "老城日",
+        tasks: ["上午大昭寺和八廓街", "午休后打车去色拉寺", "确认当天辩经安排"],
+        choices: [
+          ["天气晴热", "上午完成大昭寺，下午避开最晒时段再去色拉寺。"],
+          ["人多排队", "大昭寺保留，八廓街购物压缩到晚上。"],
+          ["体力下降", "取消色拉寺，保留老城慢走和早回酒店。"]
+        ]
+      },
+      {
+        id: "d7",
+        label: "7/7",
+        title: "羊卓雍措一日游",
+        tag: "远郊",
+        tasks: ["提前确认车辆、氧气、门票和购物点", "带外套、防晒、晕车药", "当天早睡早起"],
+        choices: [
+          ["天气好", "按原计划去羊湖，回程别再加市内夜游。"],
+          ["大风降雨", "推迟或换室内轻松日，不为打卡硬去。"],
+          ["有人不适", "取消远郊，留在拉萨做恢复日。"]
+        ]
+      },
+      {
+        id: "d8",
+        label: "7/8",
+        title: "纳木错或休整",
+        tag: "可取消",
+        tasks: ["纳木错海拔和车程都更高", "只在全员睡眠和头痛情况良好时出发", "准备一个完全休整的备选方案"],
+        choices: [
+          ["全员状态好", "可去纳木错，但不要追加购物和夜间活动。"],
+          ["有人头痛", "取消纳木错，改咖啡馆、邮寄行李、轻松购物。"],
+          ["天气不稳", "把纳木错降级为可放弃项目，保留机动日体验。"]
+        ]
+      }
+    ];
+    const prepItems = [
+      ["z164", "抢 Z164 卧铺", "硬卧/软卧优先；只剩硬座时不建议硬扛 45 小时。"],
+      ["hotel", "订可取消酒店", "八廓街-大昭寺-布宫之间，确认电梯、供氧、独卫。"],
+      ["potala", "连续关注布达拉宫预约", "全程第一优先级，约到哪天就围绕哪天调行程。"],
+      ["id", "核对身份证件", "车票、酒店、景区预约都需要实名信息一致。"],
+      ["remote", "远郊游比价", "羊湖/纳木错确认氧气、门票、购物点和取消政策。"],
+      ["medicine", "准备高原与常用药", "止痛、肠胃、感冒、晕车、防晒；慢病药带足。"],
+      ["weather", "出发前复查天气", "重点看拉萨、羊湖、纳木错的降雨和大风。"]
+    ];
+
+    function amapNavUrl(route) {
+      const a = pois[route.from], b = pois[route.to];
+      const mode = route.mode.includes("步行") ? "walk" : "car";
+      return `https://uri.amap.com/navigation?from=${a[1]},${a[0]},${encodeURIComponent(route.from)}&to=${b[1]},${b[0]},${encodeURIComponent(route.to)}&mode=${mode}&policy=1&coordinate=gaode&callnative=0`;
+    }
+    const map = L.map("map", { zoomControl: true }).setView([29.651169, 91.131357], 13);
+    L.tileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", {
+      subdomains: "1234", maxZoom: 18, minZoom: 4, attribution: "地图底图 © 高德"
+    }).addTo(map);
+    const routeLayer = L.layerGroup().addTo(map);
+    const arrowLayer = L.layerGroup().addTo(map);
+    const routeObjects = {};
+    Object.entries(pois).forEach(([name, latlng]) => {
+      L.circleMarker(latlng, { radius: 8, color: "#111827", weight: 2, fillColor: "#f5b642", fillOpacity: .96 })
+        .bindPopup(`<div class="popup-title">${name}</div><div class="popup-note">${latlng[1].toFixed(6)}, ${latlng[0].toFixed(6)}</div>`)
+        .addTo(map);
+      L.marker(latlng, {
+        icon: L.divIcon({
+          className: "poi-label",
+          html: `<div style="background:rgba(255,250,240,.9);border:1px solid #d6c6a7;border-radius:5px;padding:2px 5px;font-size:13px;font-weight:700;white-space:nowrap;">${name}</div>`,
+          iconSize: [120, 24], iconAnchor: [-10, 28]
+        })
+      }).addTo(map);
+    });
+    function routePopup(route) {
+      return `<div class="popup-title">${route.id} ${route.from} → ${route.to}</div><div class="popup-note">${route.mode}｜${route.note}</div><a class="btn" href="${amapNavUrl(route)}" target="_blank">打开高德导航</a>`;
+    }
+
+    function drawRoute(route, points) {
+      const navWeight = route.type === "remote" ? 7 : 6;
+      const halo = L.polyline(points, {
+        color: "#ffffff",
+        weight: navWeight + 5,
+        opacity: .96,
+        lineCap: "round",
+        lineJoin: "round"
+      }).addTo(routeLayer);
+      const line = L.polyline(points, {
+        color: route.color,
+        weight: navWeight,
+        opacity: .92,
+        lineCap: "round",
+        lineJoin: "round",
+        dashArray: route.mode.includes("步行") ? "8 9" : null
+      }).bindPopup(routePopup(route)).addTo(routeLayer);
+      routeObjects[route.id] = L.featureGroup([halo, line]);
+      addRouteArrows(route, points);
+    }
+
+    function arrowIndexes(points, count) {
+      if (points.length < 2) return [];
+      const indexes = [];
+      for (let i = 1; i <= count; i += 1) {
+        indexes.push(Math.min(points.length - 1, Math.max(1, Math.round(points.length * i / (count + 1)))));
+      }
+      return indexes;
+    }
+
+    function addRouteArrows(route, points) {
+      const count = route.type === "remote" ? 4 : 2;
+      arrowIndexes(points, count).forEach(index => {
+        const prev = points[index - 1];
+        const current = points[index];
+        const angle = Math.atan2(current[0] - prev[0], current[1] - prev[1]) * 180 / Math.PI;
+        L.marker(current, {
+          interactive: false,
+          icon: L.divIcon({
+            className: "route-arrow-wrap",
+            html: `<div class="route-arrow" style="color:${route.color};transform:rotate(${angle}deg);">➤</div>`,
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+          })
+        }).addTo(arrowLayer);
+      });
+    }
+
+    function routeUrl(route) {
+      return `lhasa_real_maps/routes/${encodeURIComponent(route.routeFile)}`;
+    }
+
+    async function loadRoutePoints(route) {
+      try {
+        const res = await fetch(routeUrl(route));
+        if (!res.ok) throw new Error(`${route.routeFile} not found`);
+        const data = await res.json();
+        const coordinates = data.routes?.[0]?.geometry?.coordinates;
+        if (!Array.isArray(coordinates) || coordinates.length < 2) throw new Error(`${route.routeFile} has no geometry`);
+        return { points: coordinates.map(([lng, lat]) => [lat, lng]), fromFile: true };
+      } catch (error) {
+        console.warn(`使用直线兜底：${route.id}`, error);
+        return { points: [pois[route.from], pois[route.to]], fromFile: false };
+      }
+    }
+
+    async function drawRoutes() {
+      const status = document.getElementById("routeStatus");
+      const loaded = await Promise.all(routes.map(async route => {
+        const result = await loadRoutePoints(route);
+        drawRoute(route, result.points);
+        return result.fromFile;
+      }));
+      const realCount = loaded.filter(Boolean).length;
+      status.textContent = realCount === routes.length
+        ? "已加载 R1-R9 真实导航折线路径，彩色箭头表示行进方向。"
+        : `已加载 ${realCount}/${routes.length} 条真实导航路径，其余使用直线兜底。`;
+      fitCity();
+    }
+
+    function routeCard(route) {
+      return `<div class="route-card"><div><span class="tag" style="background:${route.color}">${route.id}</span></div><div><div class="route-title">${route.from} → ${route.to}</div><div class="route-note">${route.mode}｜${route.note}</div><div class="route-actions"><button onclick="focusRoute('${route.id}')">定位</button><a class="btn" href="${amapNavUrl(route)}" target="_blank">高德导航</a></div></div></div>`;
+    }
+    document.getElementById("cityRoutes").innerHTML = routes.filter(r => r.type === "city").map(routeCard).join("");
+    document.getElementById("remoteRoutes").innerHTML = routes.filter(r => r.type === "remote").map(routeCard).join("");
+    document.getElementById("spotGrid").innerHTML = spots.map(([name, img, intro, ticket, traffic]) => `<article class="spot"><img src="${img}" alt="${name}"><div class="spot-body"><h3>${name}</h3><dl><div><dt>介绍</dt><dd>${intro}</dd></div><div><dt>门票/预约</dt><dd>${ticket}</dd></div><div><dt>交通</dt><dd>${traffic}</dd></div></dl></div></article>`).join("");
+    const money = new Intl.NumberFormat("zh-CN");
+
+    function weatherLabel(code) {
+      return weatherCodes[code] || `天气代码 ${code}`;
+    }
+
+    function weatherAdvice(cityKey, current, today) {
+      const rain = today.precipitation_probability_max ?? 0;
+      const wind = current.wind_speed_10m ?? 0;
+      const temp = current.temperature_2m ?? 0;
+      if (cityKey === "lhasa") {
+        if (rain >= 60) return "降雨概率偏高，布宫/寺庙可以照常，药王山和八廓街慢走要留雨具。";
+        if (wind >= 28) return "风比较大，远郊湖边体感会冷，羊湖/纳木错要准备外套和帽子。";
+        if (temp >= 26) return "白天日晒强，市内行程尽量上午出门，中午回酒店休息。";
+        return "天气适合市内慢走，但拉萨紫外线强，防晒和补水仍然要认真。";
+      }
+      if (cityKey === "fuzhou") {
+        return rain >= 50 ? "出发地可能有雨，去车站要给打车和行李防水留余量。" : "出发地天气压力不大，重点仍是准点到站和行李轻量化。";
+      }
+      return rain >= 50 ? "上海换乘可能遇雨，虹桥到上海站建议直接打车并预留堵车时间。" : "上海换乘天气压力不大，仍建议保守预留跨站时间。";
+    }
+
+    async function loadWeather(cityKey = "lhasa") {
+      const city = weatherCities[cityKey];
+      const nowEl = document.getElementById("weatherNow");
+      const metaEl = document.getElementById("weatherMeta");
+      const adviceEl = document.getElementById("weatherAdvice");
+      const forecastEl = document.getElementById("forecast");
+      nowEl.textContent = "读取中";
+      metaEl.innerHTML = `<span>${city.name}｜${city.altitude}</span>`;
+      adviceEl.textContent = "正在获取天气，稍等一下。";
+      forecastEl.innerHTML = "";
+      try {
+        const params = new URLSearchParams({
+          latitude: city.lat,
+          longitude: city.lon,
+          current: "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m",
+          daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max",
+          timezone: "Asia/Shanghai",
+          forecast_days: "7"
+        });
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+        if (!res.ok) throw new Error("weather request failed");
+        const data = await res.json();
+        const current = data.current;
+        const daily = data.daily;
+        const today = {
+          precipitation_probability_max: daily.precipitation_probability_max?.[0],
+          wind_speed_10m_max: daily.wind_speed_10m_max?.[0]
+        };
+        nowEl.textContent = `${Math.round(current.temperature_2m)}°C`;
+        metaEl.innerHTML = `
+          <span>${city.name}｜${weatherLabel(current.weather_code)}｜体感 ${Math.round(current.apparent_temperature)}°C</span>
+          <span>湿度 ${current.relative_humidity_2m}%｜风速 ${Math.round(current.wind_speed_10m)} km/h｜${city.altitude}</span>
+          <span>更新时间 ${String(current.time).replace("T", " ")}</span>
+        `;
+        adviceEl.textContent = weatherAdvice(cityKey, current, today);
+        forecastEl.innerHTML = daily.time.map((date, index) => `
+          <div class="forecast-day">
+            <strong>${date.slice(5)}</strong>
+            <span>${weatherLabel(daily.weather_code[index])}</span>
+            <span>${Math.round(daily.temperature_2m_min[index])}-${Math.round(daily.temperature_2m_max[index])}°C</span>
+            <span>雨 ${daily.precipitation_probability_max[index]}%</span>
+            <span>风 ${Math.round(daily.wind_speed_10m_max[index])} km/h</span>
+          </div>
+        `).join("");
+      } catch (error) {
+        nowEl.textContent = "未连接";
+        metaEl.innerHTML = `<span>${city.name}｜天气接口暂时不可用</span>`;
+        adviceEl.textContent = "离线时先按高原保守策略执行：防晒、补水、少走、远郊行程出发前再用手机天气复核。";
+        forecastEl.innerHTML = `<div class="forecast-day"><strong>提示</strong><span>联网后会自动显示 7 日预报。</span></div>`;
+      }
+    }
+
+    function setupWeatherTabs() {
+      document.querySelectorAll("[data-weather-city]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-weather-city]").forEach(item => item.classList.remove("active"));
+          btn.classList.add("active");
+          loadWeather(btn.dataset.weatherCity);
+        });
+      });
+      loadWeather("lhasa");
+    }
+
+    function renderPlanner(dayId = tripDays[0].id) {
+      const day = tripDays.find(item => item.id === dayId) || tripDays[0];
+      document.querySelectorAll("[data-planner-day]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.plannerDay === day.id);
+      });
+      document.getElementById("plannerTitle").textContent = day.title;
+      document.getElementById("plannerPill").textContent = day.tag;
+      document.getElementById("plannerList").innerHTML = day.tasks.map(task => `<li>${task}</li>`).join("");
+      document.getElementById("plannerChoices").innerHTML = day.choices.map(([label, advice], index) => `<button type="button" data-choice="${index}">${label}</button>`).join("");
+      const resultEl = document.getElementById("plannerResult");
+      resultEl.textContent = day.choices[0][1];
+      document.querySelectorAll("[data-choice]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-choice]").forEach(item => item.classList.remove("active"));
+          btn.classList.add("active");
+          resultEl.textContent = day.choices[Number(btn.dataset.choice)][1];
+        });
+      });
+      const firstChoice = document.querySelector("[data-choice='0']");
+      if (firstChoice) firstChoice.classList.add("active");
+    }
+
+    function setupPlanner() {
+      const tabs = document.getElementById("plannerTabs");
+      tabs.innerHTML = tripDays.map(day => `<button type="button" data-planner-day="${day.id}">${day.label}</button>`).join("");
+      tabs.querySelectorAll("[data-planner-day]").forEach(btn => {
+        btn.addEventListener("click", () => renderPlanner(btn.dataset.plannerDay));
+      });
+      renderPlanner();
+    }
+
+    function setupChecklist() {
+      const list = document.getElementById("prepChecklist");
+      list.innerHTML = prepItems.map(([id, title, note]) => `
+        <label class="check-item">
+          <input type="checkbox" data-prep="${id}">
+          <strong>${title}<span>${note}</span></strong>
+        </label>
+      `).join("");
+      const saved = JSON.parse(localStorage.getItem("lhasaPrep") || "{}");
+      list.querySelectorAll("[data-prep]").forEach(input => {
+        input.checked = Boolean(saved[input.dataset.prep]);
+        input.addEventListener("change", updatePrepProgress);
+      });
+      updatePrepProgress();
+    }
+
+    function updatePrepProgress() {
+      const inputs = [...document.querySelectorAll("[data-prep]")];
+      const done = inputs.filter(input => input.checked).length;
+      const saved = {};
+      inputs.forEach(input => { saved[input.dataset.prep] = input.checked; });
+      localStorage.setItem("lhasaPrep", JSON.stringify(saved));
+      document.getElementById("prepProgress").style.width = `${inputs.length ? done / inputs.length * 100 : 0}%`;
+      document.getElementById("prepText").textContent = `${done}/${inputs.length} 已完成`;
+    }
+
+    function setupBudget() {
+      const ids = ["peopleInput", "nightsInput", "roomInput", "roomsInput", "foodInput", "trainInput", "ticketInput", "remoteInput"];
+      ids.forEach(id => document.getElementById(id).addEventListener("input", updateBudget));
+      updateBudget();
+    }
+
+    function numberValue(id) {
+      return Math.max(0, Number(document.getElementById(id).value) || 0);
+    }
+
+    function updateBudget() {
+      const people = Math.max(1, numberValue("peopleInput"));
+      const nights = numberValue("nightsInput");
+      const room = numberValue("roomInput");
+      const rooms = Math.max(1, numberValue("roomsInput"));
+      const food = numberValue("foodInput");
+      const train = numberValue("trainInput");
+      const ticket = numberValue("ticketInput");
+      const remote = numberValue("remoteInput");
+      const hotelTotal = nights * room * rooms;
+      const foodTotal = people * food * 9;
+      const trainTotal = people * train;
+      const ticketTotal = people * ticket;
+      const cityTraffic = people <= 3 ? 600 : 900;
+      const total = hotelTotal + foodTotal + trainTotal + ticketTotal + remote + cityTraffic;
+      document.getElementById("budgetResult").innerHTML = `
+        预计总额：${money.format(Math.round(total))} 元
+        <small>人均约 ${money.format(Math.round(total / people))} 元。含住宿 ${money.format(hotelTotal)}、餐饮 ${money.format(foodTotal)}、大交通 ${money.format(trainTotal)}、门票 ${money.format(ticketTotal)}、远郊 ${money.format(remote)}、市内交通 ${money.format(cityTraffic)}。</small>
+      `;
+    }
+
+    function focusRoute(id) {
+      const line = routeObjects[id];
+      if (!line) return;
+      map.fitBounds(line.getBounds(), { padding: [90, 90], maxZoom: 15 });
+      line.openPopup();
+    }
+    function boundsFor(list) {
+      const pts = [];
+      list.forEach(r => {
+        const routeGroup = routeObjects[r.id];
+        if (routeGroup) {
+          routeGroup.getLayers().forEach(layer => pts.push(...layer.getLatLngs()));
+        } else {
+          pts.push(pois[r.from], pois[r.to]);
+        }
+      });
+      return L.latLngBounds(pts);
+    }
+    function fitAll() { map.fitBounds(boundsFor(routes), { padding: [80, 80] }); }
+    function fitCity() { map.fitBounds(boundsFor(routes.filter(r => r.type === "city")), { padding: [80, 80] }); }
+    function fitRemote() { map.fitBounds(boundsFor(routes.filter(r => r.type === "remote")), { padding: [80, 80] }); }
+    setupWeatherTabs();
+    setupPlanner();
+    setupChecklist();
+    setupBudget();
+    drawRoutes();
+  </script>
+</body>
+</html>
