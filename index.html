@@ -419,6 +419,27 @@
       margin-top: 2px;
       line-height: 1.45;
     }
+    .split-editor {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .split-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 1fr) minmax(100px, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+    }
+    .split-row input {
+      width: 100%;
+      border: 1px solid #bdd0c8;
+      border-radius: 6px;
+      padding: 8px 9px;
+      font: inherit;
+    }
+    .split-row button {
+      min-height: 35px;
+    }
     .progress-shell {
       height: 9px;
       border-radius: 999px;
@@ -514,6 +535,32 @@
     .fit-tag.good { background: #e7f8ef; color: #166534; border-color: #b9e7cb; }
     .fit-tag.warn { background: #fff7e8; color: #92400e; border-color: #f1c36d; }
     .fit-tag.risk { background: #feecec; color: #991b1b; border-color: #f5b5b5; }
+    .poi-checks {
+      display: grid;
+      gap: 7px;
+      max-height: 230px;
+      overflow: auto;
+      padding-right: 4px;
+      margin-bottom: 10px;
+    }
+    .poi-check {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px;
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      background: #fff;
+      color: #344054;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .poi-check input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
     .source-note {
       color: var(--muted);
       font-size: 12px;
@@ -654,12 +701,11 @@
           </article>
 
           <article class="tool-card">
-            <h3>三人预算分摊</h3>
-            <div class="calculator">
-              <label class="field">甲已垫付<input id="payerAInput" type="number" min="0" value="0"></label>
-              <label class="field">乙已垫付<input id="payerBInput" type="number" min="0" value="0"></label>
-              <label class="field">丙已垫付<input id="payerCInput" type="number" min="0" value="0"></label>
-              <label class="field">共同人数<input id="splitPeopleInput" type="number" min="1" value="3"></label>
+            <h3>预算分摊</h3>
+            <div class="split-editor" id="splitEditor"></div>
+            <div class="toolbar">
+              <button type="button" onclick="addSplitMember()">添加成员</button>
+              <button type="button" onclick="resetSplitMembers()">重置三人</button>
             </div>
             <div class="split-list" id="splitResult"></div>
           </article>
@@ -678,6 +724,12 @@
             </div>
             <h3>按天筛选</h3>
             <div class="filter-group" id="routeFilters"></div>
+            <h3>景点显示</h3>
+            <div class="poi-checks" id="poiChecks"></div>
+            <div class="toolbar">
+              <button type="button" onclick="selectDefaultPois()">默认路线点</button>
+              <button type="button" onclick="selectAllPois()">显示全部景点</button>
+            </div>
             <h3>市内小交通</h3>
             <div id="cityRoutes"></div>
             <h3>远郊一日游</h3>
@@ -788,8 +840,20 @@
       "罗布林卡": [29.651619, 91.092479],
       "西藏博物馆": [29.648382, 91.098894],
       "羊卓雍措方向": [29.190499, 90.619242],
-      "纳木错方向": [30.786294, 91.111199]
+      "纳木错方向": [30.786294, 91.111199],
+      "哲蚌寺": [29.675486, 91.045068],
+      "小昭寺": [29.655286, 91.133248],
+      "扎基寺": [29.678086, 91.134143],
+      "宗角禄康公园": [29.660392, 91.118238],
+      "文成公主剧场": [29.634011, 91.148082],
+      "拉萨河观景点": [29.636756, 91.120851],
+      "南山公园": [29.615468, 91.083559],
+      "冲赛康市场": [29.653869, 91.132011],
+      "功德林寺": [29.653614, 91.110655],
+      "娘热民俗风情园": [29.704899, 91.105556]
     };
+    const defaultPoiNames = ["拉萨站", "八廓街住宿区", "布达拉宫", "药王山观景台", "大昭寺", "色拉寺", "罗布林卡", "西藏博物馆", "羊卓雍措方向", "纳木错方向"];
+    const optionalPoiNames = Object.keys(pois).filter(name => !defaultPoiNames.includes(name));
     const routes = [
       { id: "R1", type: "city", days: ["d3"], from: "拉萨站", to: "八廓街住宿区", mode: "打车", note: "8.7km / 28分钟。抵达日带行李，直接打车。", color: "#dc2626", routeFile: "拉萨站_八廓街住宿区.json" },
       { id: "R2", type: "city", days: ["d4"], from: "八廓街住宿区", to: "布达拉宫", mode: "打车/短步行", note: "约2km。适应期建议打车，减少体力消耗。", color: "#2563eb", routeFile: "八廓街住宿区_布达拉宫.json" },
@@ -926,6 +990,7 @@
       { id: "remote", label: "只看远郊", routeIds: ["R8", "R9"] }
     ];
     let currentBudgetTotal = 0;
+    let splitMembers = [];
 
     function amapNavUrl(route) {
       const a = pois[route.from], b = pois[route.to];
@@ -939,17 +1004,18 @@
     const routeLayer = L.layerGroup().addTo(map);
     const arrowLayer = L.layerGroup().addTo(map);
     const routeObjects = {};
+    const poiObjects = {};
     Object.entries(pois).forEach(([name, latlng]) => {
-      L.circleMarker(latlng, { radius: 8, color: "#111827", weight: 2, fillColor: "#f5b642", fillOpacity: .96 })
+      const dot = L.circleMarker(latlng, { radius: defaultPoiNames.includes(name) ? 8 : 6, color: "#111827", weight: 2, fillColor: defaultPoiNames.includes(name) ? "#f5b642" : "#7dd3fc", fillOpacity: .96 })
         .bindPopup(`<div class="popup-title">${name}</div><div class="popup-note">${latlng[1].toFixed(6)}, ${latlng[0].toFixed(6)}</div>`)
-        .addTo(map);
-      L.marker(latlng, {
+      const label = L.marker(latlng, {
         icon: L.divIcon({
           className: "poi-label",
           html: `<div style="background:rgba(255,250,240,.9);border:1px solid #d6c6a7;border-radius:5px;padding:2px 5px;font-size:13px;font-weight:700;white-space:nowrap;">${name}</div>`,
           iconSize: [120, 24], iconAnchor: [-10, 28]
         })
-      }).addTo(map);
+      });
+      poiObjects[name] = L.featureGroup([dot, label]);
     });
     function routePopup(route) {
       return `<div class="popup-title">${route.id} ${route.from} → ${route.to}</div><div class="popup-note">${route.mode}｜${route.note}</div><a class="btn" href="${amapNavUrl(route)}" target="_blank">打开高德导航</a>`;
@@ -1186,8 +1252,9 @@
     }
 
     function setupBudget() {
-      const ids = ["peopleInput", "nightsInput", "roomInput", "roomsInput", "foodInput", "trainInput", "ticketInput", "remoteInput", "payerAInput", "payerBInput", "payerCInput", "splitPeopleInput"];
+      const ids = ["peopleInput", "nightsInput", "roomInput", "roomsInput", "foodInput", "trainInput", "ticketInput", "remoteInput"];
       ids.forEach(id => document.getElementById(id).addEventListener("input", updateBudget));
+      setupSplitMembers();
       updateBudget();
     }
 
@@ -1218,15 +1285,72 @@
       updateSplit();
     }
 
+    function setupSplitMembers() {
+      const saved = JSON.parse(localStorage.getItem("lhasaSplitMembers") || "null");
+      splitMembers = Array.isArray(saved) && saved.length ? saved : [
+        { name: "甲", paid: 0 },
+        { name: "乙", paid: 0 },
+        { name: "丙", paid: 0 }
+      ];
+      renderSplitEditor();
+    }
+
+    function saveSplitMembers() {
+      localStorage.setItem("lhasaSplitMembers", JSON.stringify(splitMembers));
+    }
+
+    function renderSplitEditor() {
+      const editor = document.getElementById("splitEditor");
+      editor.innerHTML = splitMembers.map((member, index) => `
+        <div class="split-row">
+          <label class="field">成员<input data-split-name="${index}" value="${member.name}"></label>
+          <label class="field">已垫付<input data-split-paid="${index}" type="number" min="0" value="${member.paid}"></label>
+          <button type="button" onclick="removeSplitMember(${index})">删除</button>
+        </div>
+      `).join("");
+      editor.querySelectorAll("[data-split-name]").forEach(input => {
+        input.addEventListener("input", () => {
+          splitMembers[Number(input.dataset.splitName)].name = input.value || `成员${Number(input.dataset.splitName) + 1}`;
+          saveSplitMembers();
+          updateSplit();
+        });
+      });
+      editor.querySelectorAll("[data-split-paid]").forEach(input => {
+        input.addEventListener("input", () => {
+          splitMembers[Number(input.dataset.splitPaid)].paid = Math.max(0, Number(input.value) || 0);
+          saveSplitMembers();
+          updateSplit();
+        });
+      });
+      updateSplit();
+    }
+
+    function addSplitMember() {
+      splitMembers.push({ name: `成员${splitMembers.length + 1}`, paid: 0 });
+      saveSplitMembers();
+      renderSplitEditor();
+    }
+
+    function removeSplitMember(index) {
+      if (splitMembers.length <= 1) return;
+      splitMembers.splice(index, 1);
+      saveSplitMembers();
+      renderSplitEditor();
+    }
+
+    function resetSplitMembers() {
+      splitMembers = [{ name: "甲", paid: 0 }, { name: "乙", paid: 0 }, { name: "丙", paid: 0 }];
+      saveSplitMembers();
+      renderSplitEditor();
+    }
+
     function updateSplit() {
-      const splitPeople = Math.max(1, numberValue("splitPeopleInput"));
-      const names = ["甲", "乙", "丙"];
-      const paid = [numberValue("payerAInput"), numberValue("payerBInput"), numberValue("payerCInput")];
+      const splitPeople = Math.max(1, splitMembers.length);
       const share = currentBudgetTotal / splitPeople;
-      document.getElementById("splitResult").innerHTML = paid.map((amount, index) => {
-        const balance = amount - share;
+      document.getElementById("splitResult").innerHTML = splitMembers.map(member => {
+        const balance = (Number(member.paid) || 0) - share;
         const text = balance >= 0 ? `应收 ${money.format(Math.round(balance))} 元` : `还需补 ${money.format(Math.round(Math.abs(balance)))} 元`;
-        return `<div class="split-item"><strong><span>${names[index]}</span><span>${text}</span></strong><span>已垫付 ${money.format(Math.round(amount))} 元；按当前预算人均 ${money.format(Math.round(share))} 元计算。</span></div>`;
+        return `<div class="split-item"><strong><span>${member.name}</span><span>${text}</span></strong><span>已垫付 ${money.format(Math.round(member.paid || 0))} 元；按当前 ${splitPeople} 人均摊，人均 ${money.format(Math.round(share))} 元。</span></div>`;
       }).join("");
     }
 
@@ -1247,6 +1371,48 @@
       wrap.querySelectorAll("[data-route-filter]").forEach(btn => {
         btn.addEventListener("click", () => applyRouteFilter(btn.dataset.routeFilter));
       });
+    }
+
+    function setupPoiChecks() {
+      const saved = JSON.parse(localStorage.getItem("lhasaVisiblePois") || "null");
+      const visible = new Set(Array.isArray(saved) && saved.length ? saved : defaultPoiNames);
+      document.getElementById("poiChecks").innerHTML = Object.keys(pois).map(name => `
+        <label class="poi-check">
+          <input type="checkbox" data-poi-name="${name}" ${visible.has(name) ? "checked" : ""}>
+          <span>${name}${optionalPoiNames.includes(name) ? "｜可选景点" : "｜默认路线点"}</span>
+        </label>
+      `).join("");
+      document.querySelectorAll("[data-poi-name]").forEach(input => {
+        input.addEventListener("change", syncPoiVisibility);
+      });
+      syncPoiVisibility();
+    }
+
+    function selectedPoiNames() {
+      return [...document.querySelectorAll("[data-poi-name]:checked")].map(input => input.dataset.poiName);
+    }
+
+    function syncPoiVisibility() {
+      const visible = new Set(selectedPoiNames());
+      Object.entries(poiObjects).forEach(([name, group]) => {
+        group.getLayers().forEach(layer => visible.has(name) ? layer.addTo(map) : map.removeLayer(layer));
+      });
+      localStorage.setItem("lhasaVisiblePois", JSON.stringify([...visible]));
+    }
+
+    function selectDefaultPois() {
+      document.querySelectorAll("[data-poi-name]").forEach(input => {
+        input.checked = defaultPoiNames.includes(input.dataset.poiName);
+      });
+      syncPoiVisibility();
+    }
+
+    function selectAllPois() {
+      document.querySelectorAll("[data-poi-name]").forEach(input => {
+        input.checked = true;
+      });
+      syncPoiVisibility();
+      map.fitBounds(L.latLngBounds(Object.values(pois)), { padding: [70, 70] });
     }
 
     function setRouteVisible(routeId, visible) {
@@ -1294,6 +1460,7 @@
     setupBudget();
     setupCountdown();
     setupRouteFilters();
+    setupPoiChecks();
     drawRoutes();
   </script>
 </body>
