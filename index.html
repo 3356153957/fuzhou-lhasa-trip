@@ -254,6 +254,49 @@
     .day { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px; background: #fff; }
     .day b { font-size: 18px; }
     .day p { margin: 0; }
+    .timeline-days { display: grid; gap: 12px; }
+    .timeline-day {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .timeline-date {
+      display: grid;
+      align-content: start;
+      gap: 4px;
+      color: #24313f;
+      font-weight: 800;
+    }
+    .timeline-date span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .timeline-content { display: grid; gap: 8px; }
+    .timeline-content h3 { margin: 0; }
+    .timeline-slots {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .timeline-slot {
+      border: 1px solid #d8e4df;
+      border-radius: 8px;
+      padding: 9px;
+      background: #f8fbfa;
+      color: #344054;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .timeline-slot strong {
+      display: block;
+      color: var(--accent-dark);
+      margin-bottom: 3px;
+    }
     .notice {
       background: #fff7e8;
       border: 1px solid #f1c36d;
@@ -494,6 +537,12 @@
       gap: 9px;
       margin-top: 10px;
     }
+    .query-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
     .countdown-item, .split-item, .fit-item {
       border: 1px solid #d8e4df;
       border-radius: 8px;
@@ -578,6 +627,8 @@
     @media (max-width: 620px) {
       .stat { grid-column: span 12; }
       .day { grid-template-columns: 1fr; }
+      .timeline-day { grid-template-columns: 1fr; }
+      .timeline-slots { grid-template-columns: 1fr; }
       th, td { font-size: 12px; padding: 8px; }
       .weather-head { grid-template-columns: 1fr; }
       .calculator { grid-template-columns: 1fr; }
@@ -623,8 +674,8 @@
         <h2>一眼看懂</h2>
         <div class="grid">
           <div class="stat"><b>9 天</b><span>含火车 2 晚，拉萨 6 晚</span></div>
-          <div class="stat"><b>Z164</b><span>上海站 18:33 发，7/3 15:36 到拉萨</span></div>
-          <div class="stat"><b>6.17</b><span>预计抢 7/1 车票，优先卧铺</span></div>
+          <div class="stat"><b id="trainStatTitle">Z164</b><span id="trainStatText">上海站 18:33 发，到拉萨约第 3 天</span></div>
+          <div class="stat"><b id="ticketStatDate">待定</b><span id="ticketStatText">按出发日自动计算抢票提醒</span></div>
           <div class="stat"><b>R1-R9</b><span>小交通路线全部在地图中可点选</span></div>
         </div>
         <p class="notice">核心策略：先抢 Z164 硬卧/软卧，再围绕布达拉宫预约调整市内日期。纳木错不是硬性必去项，身体状态不好就取消。</p>
@@ -632,6 +683,21 @@
 
       <section id="trip-tools">
         <h2>旅行互动台</h2>
+        <div class="tool-grid" style="margin-bottom:16px;">
+          <article class="tool-card">
+            <h3>出发日期与实时查询</h3>
+            <div class="calculator">
+              <label class="field">预计出发日期<input id="departureInput" type="date" value="2026-07-01"></label>
+              <label class="field">拉萨住宿晚数<input id="stayNightsInput" type="number" min="1" value="6"></label>
+            </div>
+            <div class="query-links" id="queryLinks"></div>
+            <p class="source-note">日期会保存，并同步倒计时、行程日期、查询入口。票价/库存需要到 12306、航司/携程/飞猪/酒店平台实时确认。</p>
+          </article>
+          <article class="tool-card">
+            <h3>当前计划摘要</h3>
+            <div class="result-box" id="tripSummary"></div>
+          </article>
+        </div>
         <div class="tool-grid">
           <article class="tool-card">
             <h3>实时天气与出行判断</h3>
@@ -705,7 +771,7 @@
             <div class="split-editor" id="splitEditor"></div>
             <div class="toolbar">
               <button type="button" onclick="addSplitMember()">添加成员</button>
-              <button type="button" onclick="resetSplitMembers()">重置三人</button>
+              <button type="button" onclick="resetSplitMembers()">重置成员</button>
             </div>
             <div class="split-list" id="splitResult"></div>
           </article>
@@ -787,17 +853,7 @@
 
       <section id="daily">
         <h2>每日行程</h2>
-        <div class="days">
-          <div class="day"><b>Day 1<br>7/1</b><p>福州到上海，上海虹桥跨站到上海站，乘 Z164 进藏。三人带行李建议打车，不建议地铁换乘折腾。</p></div>
-          <div class="day"><b>Day 2<br>7/2</b><p>全天火车。减少走动，别饮酒，别熬夜。经过高海拔区前后以休息为主。</p></div>
-          <div class="day"><b>Day 3<br>7/3</b><p>15:36 到拉萨站。按 R1 打车到八廓街住宿区，晚上只做低强度活动。</p></div>
-          <div class="day"><b>Day 4<br>7/4</b><p>布达拉宫、药王山观景台、布达拉宫广场。布宫约不到则用罗布林卡/博物馆替换。</p></div>
-          <div class="day"><b>Day 5<br>7/5</b><p>上午大昭寺和八廓街，下午按 R5 打车去色拉寺，看辩经安排。</p></div>
-          <div class="day"><b>Day 6<br>7/6</b><p>罗布林卡、西藏博物馆。这天强度低，适合作为恢复日。</p></div>
-          <div class="day"><b>Day 7<br>7/7</b><p>羊卓雍措一日游。建议小团或包车，提前问清门票、氧气、无人机、购物点。</p></div>
-          <div class="day"><b>Day 8<br>7/8</b><p>纳木错或休整。若有人头痛、胸闷或失眠，取消纳木错。</p></div>
-          <div class="day"><b>Day 9<br>7/9</b><p>机动日，用于补布宫预约失败、购物、邮寄行李、返程准备。</p></div>
-        </div>
+        <div class="timeline-days" id="dailyTimeline"></div>
       </section>
 
       <section id="budget">
@@ -972,12 +1028,23 @@
       ["weather", "出发前复查天气", "重点看拉萨、羊湖、纳木错的降雨和大风。"]
     ];
     const countdownItems = [
-      { title: "抢 7/1 火车票", date: "2026-06-17", note: "优先 Z164 硬卧/软卧，失败就立刻看西宁/重庆中转。" },
-      { title: "确认可取消酒店", date: "2026-06-20", note: "先锁核心区可取消房，后续再比价升级。" },
-      { title: "开始关注布达拉宫预约", date: "2026-06-24", note: "旺季最关键，约到哪天就围绕哪天调整行程。" },
-      { title: "确认羊湖/纳木错车辆", date: "2026-06-28", note: "问清氧气、门票、购物点、取消政策。" },
-      { title: "出发前天气复查", date: "2026-06-30", note: "重点看拉萨、羊湖、纳木错降雨和大风。" },
-      { title: "福州出发", date: "2026-07-01", note: "身份证、车票、药品、充电宝和外套最后复核。" }
+      { title: "抢火车票", offset: -14, note: "优先 Z164 硬卧/软卧，失败就立刻看西宁/重庆中转。" },
+      { title: "确认可取消酒店", offset: -11, note: "先锁核心区可取消房，后续再比价升级。" },
+      { title: "开始关注布达拉宫预约", offset: -7, note: "旺季最关键，约到哪天就围绕哪天调整行程。" },
+      { title: "确认羊湖/纳木错车辆", offset: -3, note: "问清氧气、门票、购物点、取消政策。" },
+      { title: "出发前天气复查", offset: -1, note: "重点看拉萨、羊湖、纳木错降雨和大风。" },
+      { title: "福州出发", offset: 0, note: "身份证、车票、药品、充电宝和外套最后复核。" }
+    ];
+    const dailyPlans = [
+      { title: "福州到上海，转 Z164 进藏", tag: "换乘日", slots: [["上午", "G256 福州到上海虹桥，早餐后出发，行李尽量精简。"], ["下午", "虹桥到上海站建议打车，留足跨站和晚餐时间。"], ["晚上", "乘 Z164 出发，补水、少走动、别熬夜。"]], focus: "当天目标只有一个：稳稳上车，不为省小钱消耗体力。" },
+      { title: "全天火车适应", tag: "车上日", slots: [["上午", "简单活动，不久站，不暴食。"], ["下午", "经过高海拔区前后减少兴奋和剧烈走动。"], ["晚上", "尽量睡觉，观察头痛、胸闷、失眠情况。"]], focus: "这天不是赶路焦虑日，是为抵达拉萨保存状态。" },
+      { title: "抵达拉萨，只做低强度适应", tag: "适应日", slots: [["下午", "约 15:36 到拉萨站，按 R1 打车到酒店。"], ["傍晚", "办理入住、吃清淡晚餐，不洗太久热水澡。"], ["晚上", "酒店周边短走即可，身体不适直接休息。"]], focus: "第一晚不要安排正式景点，适应比打卡重要。" },
+      { title: "布达拉宫优先日", tag: "预约核心", slots: [["上午", "按布宫预约时间提前抵达，减少绕路和暴晒。"], ["下午", "药王山观景台或布达拉宫广场，状态不好就删减。"], ["晚上", "早回酒店休息，给第二天老城日留体力。"]], focus: "布宫约到哪天，其他行程就围绕它移动。" },
+      { title: "大昭寺、八廓街、色拉寺", tag: "老城日", slots: [["上午", "大昭寺和八廓街，尽量避开中午强晒。"], ["下午", "午休后打车去色拉寺，提前确认辩经安排。"], ["晚上", "八廓街轻松补逛，控制购物和步行时间。"]], focus: "老城好逛但很容易走超量，建议每 60-90 分钟休息一次。" },
+      { title: "罗布林卡、西藏博物馆", tag: "恢复日", slots: [["上午", "罗布林卡园林慢走，节奏放低。"], ["下午", "西藏博物馆室内参观，雨天也友好。"], ["晚上", "整理衣物、确认远郊游车辆和天气。"]], focus: "这是全程的缓冲日，用来恢复体力很值。" },
+      { title: "羊卓雍措一日游", tag: "远郊", slots: [["上午", "早出发，带外套、防晒、晕车药和水。"], ["下午", "湖边拍照控制时间，风大时减少停留。"], ["晚上", "回拉萨后不再安排夜游。"]], focus: "羊湖比纳木错更适合作为第一段远郊，但身体不适仍应取消。" },
+      { title: "纳木错或休整", tag: "可取消", slots: [["上午", "全员睡眠和头痛情况良好才出发。"], ["下午", "若取消，可改咖啡馆、购物、邮寄行李。"], ["晚上", "为返程或机动安排留余量。"]], focus: "纳木错不是必去项，高海拔和长车程要服从身体状态。" },
+      { title: "机动与返程准备", tag: "机动日", slots: [["上午", "补布宫预约失败项，或轻松购物。"], ["下午", "邮寄行李、整理票据、确认返程交通。"], ["晚上", "早休息，避免最后一天玩到透支。"]], focus: "机动日越完整，前面几天越不焦虑。" }
     ];
     const routeFilters = [
       { id: "all", label: "全部路线", routeIds: routes.map(route => route.id) },
@@ -1110,6 +1177,100 @@
     document.getElementById("remoteRoutes").innerHTML = routes.filter(r => r.type === "remote").map(routeCard).join("");
     document.getElementById("spotGrid").innerHTML = spots.map(spot => `<article class="spot"><img src="${spot.img}" alt="${spot.name}"><div class="spot-body"><h3>${spot.name}</h3><dl><div><dt>介绍</dt><dd>${spot.intro}</dd></div><div><dt>门票/预约</dt><dd>${spot.ticket}</dd></div><div><dt>交通</dt><dd>${spot.traffic}</dd></div></dl><div class="fit-tags">${spot.fit.map(([level, text]) => `<span class="fit-tag ${level}">${text}</span>`).join("")}</div></div></article>`).join("");
     const money = new Intl.NumberFormat("zh-CN");
+
+    function readDepartureDate() {
+      return localStorage.getItem("lhasaDepartureDate") || "2026-07-01";
+    }
+
+    function dateFromInput(value) {
+      return new Date(`${value}T00:00:00+08:00`);
+    }
+
+    function addDays(date, offset) {
+      const next = new Date(date);
+      next.setDate(next.getDate() + offset);
+      return next;
+    }
+
+    function formatDate(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatShortDate(date) {
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
+    function setupDeparture() {
+      const input = document.getElementById("departureInput");
+      input.value = readDepartureDate();
+      input.addEventListener("change", () => {
+        localStorage.setItem("lhasaDepartureDate", input.value);
+        renderDateDrivenSections();
+      });
+      document.getElementById("stayNightsInput").addEventListener("input", renderDateDrivenSections);
+      renderDateDrivenSections();
+    }
+
+    function renderDateDrivenSections() {
+      renderQueryLinks();
+      setupCountdown();
+      renderDailyTimeline();
+      renderTripSummary();
+      updateOverviewDates();
+    }
+
+    function renderQueryLinks() {
+      const departure = document.getElementById("departureInput").value || readDepartureDate();
+      const start = dateFromInput(departure);
+      const arriveLhasa = addDays(start, 2);
+      const leaveLhasa = addDays(arriveLhasa, Math.max(1, numberValue("stayNightsInput")));
+      const trainQuery = `https://www.12306.cn/index/`;
+      const flightQuery = `https://flights.ctrip.com/online/list/oneway-foc-lxa?depdate=${departure}`;
+      const hotelQuery = `https://hotels.ctrip.com/hotels/list?city=41&checkin=${formatDate(arriveLhasa)}&checkout=${formatDate(leaveLhasa)}`;
+      document.getElementById("queryLinks").innerHTML = `
+        <a class="btn" href="${trainQuery}" target="_blank">查 12306 火车票</a>
+        <a class="btn" href="${flightQuery}" target="_blank">查福州到拉萨机票</a>
+        <a class="btn" href="${hotelQuery}" target="_blank">查拉萨酒店</a>
+      `;
+    }
+
+    function renderTripSummary() {
+      const departure = dateFromInput(document.getElementById("departureInput").value || readDepartureDate());
+      const arrive = addDays(departure, 2);
+      const nights = Math.max(1, numberValue("stayNightsInput"));
+      const leave = addDays(arrive, nights);
+      document.getElementById("tripSummary").innerHTML = `
+        出发：${formatDate(departure)}<br>
+        预计抵达拉萨：${formatDate(arrive)}<br>
+        拉萨住宿：${nights} 晚，预计住到 ${formatDate(leave)}<br>
+        查询入口已按这些日期生成，实际票价和库存以平台实时结果为准。
+      `;
+    }
+
+    function updateOverviewDates() {
+      const departure = dateFromInput(document.getElementById("departureInput").value || readDepartureDate());
+      const arrive = addDays(departure, 2);
+      const sale = addDays(departure, -14);
+      document.querySelector(".hero-meta span:first-child").textContent = `${formatDate(departure)} 出发`;
+      document.getElementById("trainStatText").textContent = `上海站 18:33 发，${formatShortDate(arrive)} 左右到拉萨`;
+      document.getElementById("ticketStatDate").textContent = formatShortDate(sale);
+      document.getElementById("ticketStatText").textContent = `预计抢 ${formatShortDate(departure)} 车票，优先卧铺`;
+    }
+
+    function renderDailyTimeline() {
+      const departure = dateFromInput(document.getElementById("departureInput").value || readDepartureDate());
+      document.getElementById("dailyTimeline").innerHTML = dailyPlans.map((plan, index) => {
+        const date = addDays(departure, index);
+        return `<article class="timeline-day">
+          <div class="timeline-date">Day ${index + 1}<span>${formatShortDate(date)}</span><span>${plan.tag}</span></div>
+          <div class="timeline-content">
+            <h3>${plan.title}</h3>
+            <div class="timeline-slots">${plan.slots.map(([time, text]) => `<div class="timeline-slot"><strong>${time}</strong>${text}</div>`).join("")}</div>
+            <p class="notice">${plan.focus}</p>
+          </div>
+        </article>`;
+      }).join("");
+    }
 
     function weatherLabel(code) {
       return weatherCodes[code] || `天气代码 ${code}`;
@@ -1357,11 +1518,12 @@
     function setupCountdown() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const departure = dateFromInput(document.getElementById("departureInput").value || readDepartureDate());
       document.getElementById("countdownList").innerHTML = countdownItems.map(item => {
-        const target = new Date(`${item.date}T00:00:00+08:00`);
+        const target = addDays(departure, item.offset);
         const days = Math.ceil((target - today) / 86400000);
         const label = days > 0 ? `还有 ${days} 天` : days === 0 ? "今天" : `已过 ${Math.abs(days)} 天`;
-        return `<div class="countdown-item"><strong><span>${item.title}</span><span>${label}</span></strong><span>${item.date}｜${item.note}</span></div>`;
+        return `<div class="countdown-item"><strong><span>${item.title}</span><span>${label}</span></strong><span>${formatDate(target)}｜${item.note}</span></div>`;
       }).join("");
     }
 
@@ -1455,10 +1617,10 @@
     function fitCity() { map.fitBounds(boundsFor(routes.filter(r => r.type === "city")), { padding: [80, 80] }); }
     function fitRemote() { map.fitBounds(boundsFor(routes.filter(r => r.type === "remote")), { padding: [80, 80] }); }
     setupWeatherTabs();
+    setupDeparture();
     setupPlanner();
     setupChecklist();
     setupBudget();
-    setupCountdown();
     setupRouteFilters();
     setupPoiChecks();
     drawRoutes();
